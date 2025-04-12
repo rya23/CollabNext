@@ -447,7 +447,7 @@ function EditorWithStorage({ fileId }: TextEditorProps) {
                         <button onClick={() => setShowAnalysis(!showAnalysis)}>Story Analysis</button>
                         <button
                             onClick={() => setCreateVersionDialogOpen(true)}
-                            className="ml-auto mr-4 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                            className="ml-auto mr-4 px-3 py-1 bg-[#a0a263] text-white rounded hover:bg-[#808203]"
                         >
                             Save Version
                         </button>
@@ -503,7 +503,7 @@ function EditorWithStorage({ fileId }: TextEditorProps) {
                             </button>
                             <button
                                 onClick={createVersion}
-                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                className="px-4 py-2 bg-[#a0a263] text-white rounded hover:bg-[#808203]"
                                 disabled={isSaving}
                             >
                                 {isSaving ? 'Saving...' : 'Save'}

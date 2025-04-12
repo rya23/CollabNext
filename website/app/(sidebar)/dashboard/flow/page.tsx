@@ -1,10 +1,10 @@
-import Flowchart from '@/components/flowchart';
+// import Flowchart from '@/components/flowchart';
 import React from 'react';
 
 const Page = () => {
     return (
         <div>
-            <Flowchart />
+            {/* <Flowchart /> */}
         </div>
     );
 };
