@@ -174,7 +174,7 @@ export default function Sidebar({ session }: { session: any }) {
                                     <span className="text-white font-medium">{getInitials(user.name || 'User')}</span>
                                 </div>
                             )}
-                            <div className="flex-1">
+                            <div className="flex-1 hover:cursor-pointer " onClick={() => router.push('/dashboard/profile')}>
                                 <h4 className="text-sm font-medium text-white">{user.name || 'User'}</h4>
                                 <p className="text-xs text-gray-400">{user.email}</p>
                             </div>
