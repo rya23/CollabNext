@@ -87,31 +87,31 @@ export default function SettingsPage() {
 
   return (
     <div className="container max-w-4xl py-10 pl-[8rem]">
-      <h1 className="text-3xl font-bold mb-6">Settings</h1>
+      <h1 className="text-3xl font-bold mb-6 text-foreground">Settings</h1>
 
       <div className="space-y-6">
         {/* Appearance */}
-        <Card className="bg-[#0A0A0A] border-gray-800 shadow-md">
+        <Card className="bg-background border-border">
           <CardHeader>
-            <CardTitle className="text-white">Appearance</CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardTitle className="text-foreground">Appearance</CardTitle>
+            <CardDescription className="text-muted-foreground">
               Customize how Nuclitron looks and feels
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="theme" className="text-white">
+                <Label htmlFor="theme" className="text-foreground">
                   Theme
                 </Label>
-                <div className="text-sm text-gray-400">
+                <div className="text-sm text-muted-foreground">
                   Choose between light and dark theme
                 </div>
               </div>
               <Button
                 variant="outline"
                 size="icon"
-                className="border-gray-700 hover:bg-gray-800 hover:text-white"
+                className="border-border hover:bg-secondary hover:text-secondary-foreground"
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               >
                 {theme === "dark" ? (
@@ -125,16 +125,16 @@ export default function SettingsPage() {
         </Card>
 
         {/* Language and Region */}
-        <Card className="bg-[#0A0A0A] border-gray-800 shadow-md">
+        <Card className="bg-background border-border">
           <CardHeader>
-            <CardTitle className="text-white">Language & Region</CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardTitle className="text-foreground">Language & Region</CardTitle>
+            <CardDescription className="text-muted-foreground">
               Set your language and regional preferences
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="language" className="text-white">
+              <Label htmlFor="language" className="text-foreground">
                 Language
               </Label>
               <Popover open={openLanguage} onOpenChange={setOpenLanguage}>
@@ -143,7 +143,7 @@ export default function SettingsPage() {
                     variant="outline"
                     role="combobox"
                     aria-expanded={openLanguage}
-                    className="w-full justify-between bg-[#1A1A1A] border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
+                    className="w-full justify-between bg-background border-border text-foreground hover:bg-secondary hover:text-secondary-foreground"
                   >
                     <Globe className="mr-2 h-4 w-4" />
                     {languages.find((l) => l.value === language)?.label ||
@@ -151,13 +151,13 @@ export default function SettingsPage() {
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[300px] p-0 bg-[#1A1A1A] border-gray-700">
+                <PopoverContent className="w-[300px] p-0 bg-background border-border">
                   <Command className="bg-transparent">
                     <CommandInput
                       placeholder="Search language..."
-                      className="text-gray-300"
+                      className="text-foreground"
                     />
-                    <CommandEmpty className="text-gray-400">
+                    <CommandEmpty className="text-muted-foreground">
                       No language found.
                     </CommandEmpty>
                     <CommandGroup>
@@ -169,7 +169,7 @@ export default function SettingsPage() {
                             setLanguage(currentValue);
                             setOpenLanguage(false);
                           }}
-                          className="text-gray-300 hover:bg-gray-800"
+                          className="text-foreground hover:bg-secondary"
                         >
                           <Check
                             className={`mr-2 h-4 w-4 ${
@@ -188,7 +188,7 @@ export default function SettingsPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="timezone" className="text-white">
+              <Label htmlFor="timezone" className="text-foreground">
                 Timezone
               </Label>
               <Popover open={openTimezone} onOpenChange={setOpenTimezone}>
@@ -197,7 +197,7 @@ export default function SettingsPage() {
                     variant="outline"
                     role="combobox"
                     aria-expanded={openTimezone}
-                    className="w-full justify-between bg-[#1A1A1A] border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
+                    className="w-full justify-between bg-background border-border text-foreground hover:bg-secondary hover:text-secondary-foreground"
                   >
                     <Clock className="mr-2 h-4 w-4" />
                     {timezones.find((t) => t.value === timezone)?.label ||
@@ -205,13 +205,13 @@ export default function SettingsPage() {
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[300px] p-0 bg-[#1A1A1A] border-gray-700">
+                <PopoverContent className="w-[300px] p-0 bg-background border-border">
                   <Command className="bg-transparent">
                     <CommandInput
                       placeholder="Search timezone..."
-                      className="text-gray-300"
+                      className="text-foreground"
                     />
-                    <CommandEmpty className="text-gray-400">
+                    <CommandEmpty className="text-muted-foreground">
                       No timezone found.
                     </CommandEmpty>
                     <CommandGroup>
@@ -223,7 +223,7 @@ export default function SettingsPage() {
                             setTimezone(currentValue);
                             setOpenTimezone(false);
                           }}
-                          className="text-gray-300 hover:bg-gray-800"
+                          className="text-foreground hover:bg-secondary"
                         >
                           <Check
                             className={`mr-2 h-4 w-4 ${
@@ -244,20 +244,20 @@ export default function SettingsPage() {
         </Card>
 
         {/* Notifications */}
-        <Card className="bg-[#0A0A0A] border-gray-800 shadow-md">
+        <Card className="bg-background border-border">
           <CardHeader>
-            <CardTitle className="text-white">Notifications</CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardTitle className="text-foreground">Notifications</CardTitle>
+            <CardDescription className="text-muted-foreground">
               Configure how and when you want to be notified
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="app-notifications" className="text-white">
+                <Label htmlFor="app-notifications" className="text-foreground">
                   App Notifications
                 </Label>
-                <div className="text-sm text-gray-400">
+                <div className="text-sm text-muted-foreground">
                   Receive notifications within the application
                 </div>
               </div>
@@ -265,15 +265,15 @@ export default function SettingsPage() {
                 id="app-notifications"
                 checked={notifications}
                 onCheckedChange={setNotifications}
-                className="data-[state=checked]:bg-blue-500"
+                className="data-[state=checked]:bg-primary"
               />
             </div>
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="email-notifications" className="text-white">
+                <Label htmlFor="email-notifications" className="text-foreground">
                   Email Notifications
                 </Label>
-                <div className="text-sm text-gray-400">
+                <div className="text-sm text-muted-foreground">
                   Receive notifications via email
                 </div>
               </div>
@@ -281,27 +281,27 @@ export default function SettingsPage() {
                 id="email-notifications"
                 checked={emailNotifications}
                 onCheckedChange={setEmailNotifications}
-                className="data-[state=checked]:bg-blue-500"
+                className="data-[state=checked]:bg-primary"
               />
             </div>
           </CardContent>
         </Card>
 
         {/* Preferences */}
-        <Card className="bg-[#0A0A0A] border-gray-800 shadow-md">
+        <Card className="bg-background border-border">
           <CardHeader>
-            <CardTitle className="text-white">Preferences</CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardTitle className="text-foreground">Preferences</CardTitle>
+            <CardDescription className="text-muted-foreground">
               Customize your workflow and user experience
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="auto-save" className="text-white">
+                <Label htmlFor="auto-save" className="text-foreground">
                   Auto Save
                 </Label>
-                <div className="text-sm text-gray-400">
+                <div className="text-sm text-muted-foreground">
                   Automatically save your work as you type
                 </div>
               </div>
@@ -309,7 +309,7 @@ export default function SettingsPage() {
                 id="auto-save"
                 checked={autoSave}
                 onCheckedChange={setAutoSave}
-                className="data-[state=checked]:bg-blue-500"
+                className="data-[state=checked]:bg-primary"
               />
             </div>
           </CardContent>

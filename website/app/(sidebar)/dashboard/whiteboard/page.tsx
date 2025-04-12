@@ -2,7 +2,7 @@ import Whiteboard from '@/components/Whiteboard';
 import React from 'react';
 
 const whiteboard = () => {
-    return <Whiteboard />;
+    return 0;
 };
 
 export default whiteboard;

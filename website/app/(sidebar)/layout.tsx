@@ -9,9 +9,11 @@ const SidebarLayout = async ({
 }>) => {
   const session = await auth();
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen flex">
       <Sidebar session={session} />
-      <main className="lg:pl-[280px]">{children}</main>
+      <main className="flex-1 ml-[280px] bg-background">
+        {children}
+      </main>
     </div>
   );
 };
