@@ -4,15 +4,24 @@ import { NextRequest, NextResponse } from 'next/server';
 // Initialize the Google Generative AI client with the API key
 const apiKey = 'AIzaSyABHWecL1WasCQlnz6K7GJkqOBFW9Ac-PM';
 
+interface ChatMessage {
+    role: 'user' | 'assistant';
+    content: string;
+    generatedPrompt?: string;
+}
+
 export async function POST(request: NextRequest) {
     try {
         // Parse the request body
-        const { story } = await request.json();
+        const { story, history } = await request.json();
 
         // Validate the story input
         if (!story) {
             return NextResponse.json({ error: 'Story input is required' }, { status: 400 });
         }
+        
+        // Process chat history if available
+        const chatHistory = history as ChatMessage[] || [];
 
         // Initialize the Gemini API client
         const genAI = new GoogleGenerativeAI(apiKey);
@@ -67,9 +76,32 @@ ABSOLUTELY OMIT all unnecessary text, explanations, or introductions. Your outpu
             generationConfig,
             history: [],
         });
+        
+        // Prepare context from chat history
+        let contextPrompt = story;
+        
+        if (chatHistory.length > 0) {
+            // Extract previous prompts and user requests for context
+            const historyContext = chatHistory
+                .filter(msg => msg.role === 'user' || msg.generatedPrompt)
+                .map(msg => {
+                    if (msg.role === 'user') {
+                        return `User request: ${msg.content}`;
+                    } else if (msg.generatedPrompt) {
+                        return `Previous comic prompt: ${msg.generatedPrompt}`;
+                    }
+                    return '';
+                })
+                .filter(text => text !== '')
+                .join('\n\n');
+            
+            if (historyContext) {
+                contextPrompt = `Previous context:\n${historyContext}\n\nNew request: ${story}\n\nPlease generate a comic prompt that takes into account the previous context and the new request. If the user is requesting changes to the previous panels, modify the prompt accordingly.`;
+            }
+        }
 
         // Send the message to generate a comic prompt
-        const result = await chatSession.sendMessage(story);
+        const result = await chatSession.sendMessage(contextPrompt);
 
         // Get the generated prompt text
         const generatedPrompt = result.response.text();

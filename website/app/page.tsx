@@ -5,9 +5,9 @@ import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-[#030303]">
+    <div className="flex flex-col min-h-screen  ">
       <Navbar />
-      <div className="container flex flex-1 flex-col mx-auto bg-[#030303]">
+      <div className="container flex flex-1 flex-col mx-auto  ">
         <HeroGeometric
           badge="NUCLITRON"
           title1="CollabNext"

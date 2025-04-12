@@ -125,15 +125,15 @@ export default function FavoritesPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen p-6 bg-gray-900">
+    <div className="flex flex-col min-h-screen p-6 bg-background">
       <Toaster />
 
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+        <h1 className="text-3xl font-bold text-foreground mb-2">
           {userName ? `${userName}'s Favorites` : "Favorite Projects"}
         </h1>
-        <p className="text-gray-400">
+        <p className="text-muted-foreground">
           Your most important projects in one place
         </p>
       </div>
@@ -147,15 +147,15 @@ export default function FavoritesPage() {
             .map((_, index) => (
               <div
                 key={index}
-                className="rounded-xl bg-gray-800 border border-gray-700 animate-pulse p-6 h-52"
+                className="rounded-xl bg-card border border-border animate-pulse p-6 h-52"
               >
                 <div className="flex justify-between items-start mb-8">
-                  <div className="p-3 rounded-lg bg-gray-700 h-12 w-12"></div>
-                  <div className="h-6 w-6 bg-gray-700 rounded-full"></div>
+                  <div className="p-3 rounded-lg bg-secondary h-12 w-12"></div>
+                  <div className="h-6 w-6 bg-secondary rounded-full"></div>
                 </div>
-                <div className="h-6 w-3/4 bg-gray-700 rounded mb-3"></div>
-                <div className="h-4 w-1/2 bg-gray-700 rounded mb-6"></div>
-                <div className="h-2 w-full bg-gray-700 rounded-full"></div>
+                <div className="h-6 w-3/4 bg-secondary rounded mb-3"></div>
+                <div className="h-4 w-1/2 bg-secondary rounded mb-6"></div>
+                <div className="h-2 w-full bg-secondary rounded-full"></div>
               </div>
             ))
         ) : favoriteProjects.length > 0 ? (
@@ -166,21 +166,21 @@ export default function FavoritesPage() {
               className="relative group cursor-pointer"
               onClick={() => router.push(`/dashboard/project/${project.id}`)}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-xl group-hover:from-blue-500/10 group-hover:to-purple-500/10 transition-all" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 rounded-xl group-hover:from-primary/10 group-hover:to-accent/10 transition-all" />
 
-              <div className="relative p-6 rounded-xl bg-gray-800 border border-gray-700 group-hover:border-gray-600 transition-all">
+              <div className="relative p-6 rounded-xl bg-card border border-border group-hover:border-primary/20 transition-all">
                 <div className="flex justify-between items-start">
-                  <div className="p-3 rounded-lg bg-gray-700 group-hover:bg-gray-600 transition-colors">
-                    <Folder className="h-6 w-6 text-amber-400" />
+                  <div className="p-3 rounded-lg bg-secondary group-hover:bg-secondary/80 transition-colors">
+                    <Folder className="h-6 w-6 text-primary" />
                   </div>
-                  <Heart className="h-6 w-6 fill-red-500 text-red-500 drop-shadow-glow" />
+                  <Heart className="h-6 w-6 fill-destructive text-destructive drop-shadow" />
                 </div>
 
-                <h3 className="text-lg font-semibold text-white mt-4 group-hover:text-blue-400 transition-colors">
+                <h3 className="text-lg font-semibold text-foreground mt-4 group-hover:text-primary transition-colors">
                   {project.title}
                 </h3>
 
-                <div className="flex items-center gap-4 mt-2 text-sm text-gray-400">
+                <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Clock className="h-3.5 w-3.5" />
                     {project.lastModified}
@@ -189,13 +189,13 @@ export default function FavoritesPage() {
                 </div>
 
                 <div className="mt-4">
-                  <div className="flex justify-between text-xs text-gray-500 mb-1">
+                  <div className="flex justify-between text-xs text-muted-foreground mb-1">
                     <span>Progress</span>
                     <span>{project.progress}%</span>
                   </div>
-                  <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"
+                      className="h-full bg-primary rounded-full"
                       style={{ width: `${project.progress}%` }}
                     />
                   </div>
@@ -204,18 +204,18 @@ export default function FavoritesPage() {
             </motion.div>
           ))
         ) : (
-          <div className="col-span-full p-12 text-center rounded-xl bg-gray-800 border border-gray-700">
-            <Heart className="h-16 w-16 mx-auto mb-6 text-gray-600" />
-            <h2 className="text-2xl font-semibold text-white mb-4">
+          <div className="col-span-full p-12 text-center rounded-xl bg-card border border-border">
+            <Heart className="h-16 w-16 mx-auto mb-6 text-muted-foreground" />
+            <h2 className="text-2xl font-semibold text-foreground mb-4">
               No favorites yet
             </h2>
-            <p className="text-gray-400 mb-8 max-w-md mx-auto">
+            <p className="text-muted-foreground mb-8 max-w-md mx-auto">
               Add projects to your favorites by clicking the heart icon on any
               project in your dashboard.
             </p>
             <button
               onClick={() => router.push("/dashboard")}
-              className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all"
+              className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all"
             >
               Go to Dashboard
             </button>
