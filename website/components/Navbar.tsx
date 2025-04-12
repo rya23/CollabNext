@@ -41,9 +41,10 @@ const Navbar = () => {
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-8">
           <NavItem href="/" label="Home" />
-          <NavItem href="#features" label="Features" />
+          <NavItem href="/image-generator" label="Image Generator" />
+          <NavItem href="/comic-generator" label="Comic Generator" />
+          <NavItem href="/sketch-generator" label="Sketch Generator" />
           <NavItem href="#about" label="About" />
-          <NavItem href="#faq" label="FAQ" />
           <div className="flex space-x-3">
             <Link href="/login">
             <Button
@@ -87,18 +88,23 @@ const Navbar = () => {
                 onClick={() => setMobileMenuOpen(false)}
               />
               <MobileNavItem
-                href="#features"
-                label="Features"
+                href="/image-generator"
+                label="Image Generator"
+                onClick={() => setMobileMenuOpen(false)}
+              />
+              <MobileNavItem
+                href="/comic-generator"
+                label="Comic Generator"
+                onClick={() => setMobileMenuOpen(false)}
+              />
+              <MobileNavItem
+                href="/sketch-generator"
+                label="Sketch Generator"
                 onClick={() => setMobileMenuOpen(false)}
               />
               <MobileNavItem
                 href="#about"
                 label="About"
-                onClick={() => setMobileMenuOpen(false)}
-              />
-              <MobileNavItem
-                href="#faq"
-                label="FAQ"
                 onClick={() => setMobileMenuOpen(false)}
               />
               <div className="pt-4 flex flex-col space-y-3">
