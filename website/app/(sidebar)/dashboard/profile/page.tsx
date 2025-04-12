@@ -267,9 +267,9 @@ const ProfilePage = () => {
   // Show loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#101828] text-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="flex flex-col items-center">
-          <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-4" />
+          <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
           <p className="text-lg">Loading profile...</p>
         </div>
       </div>
@@ -355,7 +355,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#101828] text-gray-100">
+    <div className="min-h-screen bg-background text-foreground">
       <Head>
         <title>{userData.name} | Nuclitron Research Profile</title>
         <meta
@@ -381,10 +381,10 @@ const ProfilePage = () => {
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
       <div className="container mx-auto p-6 space-y-8">
-        <h1 className="text-3xl font-bold mb-6 text-white">User Profile</h1>
+        <h1 className="text-3xl font-bold mb-6 text-foreground">User Profile</h1>
 
         {/* Profile Header */}
-        <Card className="mb-6 bg-[#1D2939] border-0 shadow-lg">
+        <Card className="mb-6 bg-card border-border shadow-lg">
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
               <div className="relative">
@@ -465,7 +465,7 @@ const ProfilePage = () => {
                       <Link2 className="mr-2" /> Share Profile
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-56 bg-[#1D2939] border-[#334155] text-white p-2">
+                  <PopoverContent className="w-56 bg-card border-border text-foreground p-2">
                     <div className="space-y-2">
                       <h4 className="text-sm font-medium pl-2 pb-2 border-b border-[#334155]">
                         Share via
@@ -538,7 +538,7 @@ const ProfilePage = () => {
 
         {/* Avatar Edit Dialog */}
         <Dialog open={isAvatarDialogOpen} onOpenChange={setIsAvatarDialogOpen}>
-          <DialogContent className="bg-[#1D2939] border-[#334155] text-white">
+          <DialogContent className="bg-card border-border text-foreground">
             <DialogHeader>
               <DialogTitle>Update Profile Picture</DialogTitle>
               <DialogDescription className="text-gray-400">
@@ -683,22 +683,22 @@ const ProfilePage = () => {
 
         {/* Activity Tracking Tabs */}
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid grid-cols-3 mb-6 bg-[#1D2939]">
+          <TabsList className="grid grid-cols-3 mb-6 bg-card">
             <TabsTrigger
               value="overview"
-              className="data-[state=active]:bg-[#344054] data-[state=active]:text-white"
+              className="data-[state=active]:bg-secondary data-[state=active]:text-foreground"
             >
               Overview
             </TabsTrigger>
             <TabsTrigger
               value="activity"
-              className="data-[state=active]:bg-[#344054] data-[state=active]:text-white"
+              className="data-[state=active]:bg-secondary data-[state=active]:text-foreground"
             >
               Activity
             </TabsTrigger>
             <TabsTrigger
               value="stats"
-              className="data-[state=active]:bg-[#344054] data-[state=active]:text-white"
+              className="data-[state=active]:bg-secondary data-[state=active]:text-foreground"
             >
               Statistics
             </TabsTrigger>
@@ -706,7 +706,7 @@ const ProfilePage = () => {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            <Card className="bg-[#1D2939] border-0 shadow-lg py-3">
+            <Card className="bg-card border-border shadow-lg py-3">
               <CardContent className="p-6">
                 <h3 className="text-xl font-semibold mb-4 text-white">
                   Activity Overview
@@ -862,7 +862,7 @@ const ProfilePage = () => {
             </Card>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="bg-[#1D2939] border-0 shadow-lg">
+              <Card className="bg-card border-border shadow-lg">
                 <CardContent className="p-6">
                   <h3 className="text-xl font-semibold mb-4 text-white">
                     Recent Activities
@@ -901,7 +901,7 @@ const ProfilePage = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-[#1D2939] border-0 shadow-lg">
+              <Card className="bg-card border-border shadow-lg">
                 <CardContent className="p-6">
                   <h3 className="text-xl font-semibold mb-6 text-white">
                     Achievements
@@ -1005,7 +1005,7 @@ const ProfilePage = () => {
 
           {/* Activity Tab */}
           <TabsContent value="activity">
-            <Card className="bg-[#1D2939] border-0 shadow-lg">
+            <Card className="bg-card border-border shadow-lg">
               <CardContent className="p-6">
                 <h3 className="text-xl font-semibold mb-4 text-white">
                   Activity Timeline
@@ -1150,7 +1150,7 @@ const ProfilePage = () => {
 
           {/* Statistics Tab */}
           <TabsContent value="stats">
-            <Card className="bg-[#1D2939] border-0 shadow-lg">
+            <Card className="bg-card border-border shadow-lg">
               <CardContent className="p-6">
                 <h3 className="text-xl font-semibold mb-4 text-white">
                   Activity Statistics

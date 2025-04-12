@@ -421,37 +421,55 @@ function EditorWithStorage({ fileId }: TextEditorProps) {
             <div className="h-full">
                 <div className={styles.container}>
                     <div className={styles.editorHeader}>
-                        <StaticToolbar editor={editor} />
-
-                        <button
-                            onClick={toggleAIChat}
-                            className="p-2 rounded-full hover:bg-gray-200 transition-colors"
-                            title="AI Content Generator"
-                        >
-                            <ChatBubbleLeftIcon className="w-5 h-5" />
-                        </button>
-                        <button
-                            onClick={toggleVersionHistory}
-                            className="p-2 rounded-full hover:bg-gray-200 transition-colors"
-                            title="Version History"
-                        >
-                            <ClockIcon className="w-5 h-5" />
-                        </button>
-                        <button
-                            onClick={toggleSummarizer}
-                            className="p-2 rounded-full hover:bg-gray-200 transition-colors"
-                            title="Summarize Content"
-                        >
-                            <DocumentTextIcon className="w-5 h-5" />
-                        </button>
-                        <button onClick={() => setShowAnalysis(!showAnalysis)}>Story Analysis</button>
-                        <button
-                            onClick={() => setCreateVersionDialogOpen(true)}
-                            className="ml-auto mr-4 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-                        >
-                            Save Version
-                        </button>
-                        <Avatars />
+                        <div className="flex items-center space-x-6 w-full">
+                            <div className="flex-1">
+                                <StaticToolbar editor={editor} />
+                            </div>
+                            
+                            <div className="flex items-center gap-4 px-4">
+                                <button
+                                    onClick={toggleAIChat}
+                                    className="p-2.5 rounded-lg hover:bg-secondary/80 transition-colors border border-border"
+                                    title="AI Content Generator"
+                                >
+                                    <ChatBubbleLeftIcon className="w-5 h-5 text-foreground" />
+                                </button>
+                                <button
+                                    onClick={toggleVersionHistory}
+                                    className="p-2.5 rounded-lg hover:bg-secondary/80 transition-colors border border-border"
+                                    title="Version History"
+                                >
+                                    <ClockIcon className="w-5 h-5 text-foreground" />
+                                </button>
+                                <button
+                                    onClick={toggleSummarizer}
+                                    className="p-2.5 rounded-lg hover:bg-secondary/80 transition-colors border border-border"
+                                    title="Summarize Content"
+                                >
+                                    <DocumentTextIcon className="w-5 h-5 text-foreground" />
+                                </button>
+                                
+                                <div className="h-6 w-[1px] bg-border mx-2"></div>
+                                
+                                <button 
+                                    onClick={() => setShowAnalysis(!showAnalysis)}
+                                    className="px-4 py-2 rounded-lg hover:bg-secondary/80 transition-colors border border-border"
+                                    title="Story Analysis"
+                                >
+                                    <span className="text-foreground text-sm">Analysis</span>
+                                </button>
+                                <button
+                                    onClick={() => setCreateVersionDialogOpen(true)}
+                                    className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
+                                >
+                                    Save Version
+                                </button>
+                            </div>
+                            
+                            <div className="pl-4 border-l border-border">
+                                <Avatars />
+                            </div>
+                        </div>
                     </div>
                     <div className={styles.editorPanel}>
                         <EditorContent editor={editor} className={styles.editorContainer} />

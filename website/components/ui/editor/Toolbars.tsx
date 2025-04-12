@@ -12,32 +12,45 @@ type Props = {
 
 export function StaticToolbar({ editor }: Props) {
     return (
-        <Toolbar editor={editor} data-toolbar="static">
-            <Toolbar.SectionHistory />
-            <Toolbar.Separator />
-            <ToolbarBlockSelector editor={editor} />
-            <Toolbar.Separator />
-            <Toolbar.SectionInline />
-            <ToolbarInlineAdvanced editor={editor} />
-            <Toolbar.Separator />
-            <ToolbarAlignment editor={editor} />
-            <Toolbar.Separator />
-            <ToolbarMedia editor={editor} />
-            <Toolbar.Separator />
-            <Toolbar.Separator />
-            <Toolbar.SectionCollaboration />
+        <Toolbar 
+            editor={editor} 
+            data-toolbar="static"
+            className="flex items-center gap-2 p-2 bg-card rounded-lg border border-border shadow-sm"
+        >
+            <div className="flex items-center gap-2">
+                <Toolbar.SectionHistory className="flex items-center gap-1" />
+                <Toolbar.Separator className="w-[1px] h-7 bg-border mx-1" />
+                
+                <div className="flex items-center gap-2">
+                    <ToolbarBlockSelector editor={editor} className="min-w-[120px]" />
+                    <Toolbar.Separator className="w-[1px] h-7 bg-border mx-1" />
+                    <Toolbar.SectionInline className="flex items-center gap-1" />
+                    <ToolbarInlineAdvanced editor={editor} />
+                    <Toolbar.Separator className="w-[1px] h-7 bg-border mx-1" />
+                    <ToolbarAlignment editor={editor} />
+                    <Toolbar.Separator className="w-[1px] h-7 bg-border mx-1" />
+                    <ToolbarMedia editor={editor} />
+                </div>
+                
+                <Toolbar.Separator className="w-[1px] h-7 bg-border mx-1" />
+                <Toolbar.SectionCollaboration className="flex items-center gap-1" />
+            </div>
         </Toolbar>
     );
 }
 
 export function SelectionToolbar({ editor }: Props) {
     return (
-        <FloatingToolbar editor={editor} data-toolbar="selection">
-            <ToolbarBlockSelector editor={editor} />
-            <Toolbar.Separator />
-            <Toolbar.SectionInline />
-            <Toolbar.Separator />
-            <Toolbar.SectionCollaboration />
+        <FloatingToolbar 
+            editor={editor} 
+            data-toolbar="selection"
+            className="flex items-center gap-2 p-2 bg-card/95 backdrop-blur border border-border rounded-lg shadow-lg"
+        >
+            <ToolbarBlockSelector editor={editor} className="min-w-[120px]" />
+            <Toolbar.Separator className="w-[1px] h-7 bg-border mx-1" />
+            <Toolbar.SectionInline className="flex items-center gap-1" />
+            <Toolbar.Separator className="w-[1px] h-7 bg-border mx-1" />
+            <Toolbar.SectionCollaboration className="flex items-center gap-1" />
         </FloatingToolbar>
     );
 }
