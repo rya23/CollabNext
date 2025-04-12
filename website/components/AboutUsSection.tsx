@@ -12,7 +12,7 @@ import { CardHoverEffectDemo } from './CardEffect';
 const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) => {
     return (
         <motion.div
-            className="bg-[#0a0a0a] border border-purple-900/20 rounded-xl p-6 flex flex-col items-center"
+            className="bg-card border border-border rounded-xl p-6 flex flex-col items-center"
             whileHover={{
                 y: -5,
                 boxShadow: '0 10px 30px -15px rgba(138, 75, 175, 0.2)',
@@ -22,20 +22,20 @@ const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode; titl
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
         >
-            <div className="bg-gradient-to-r from-purple-600 to-blue-500 w-12 h-12 rounded-full flex items-center justify-center mb-4">
+            <div className="bg-gradient-to-r from-primary to-primary/80 w-12 h-12 rounded-full flex items-center justify-center mb-4">
                 {icon}
             </div>
-            <h3 className="text-xl font-semibold mb-2 text-white">{title}</h3>
-            <p className="text-[#858192] text-center">{description}</p>
+            <h3 className="text-xl font-semibold mb-2 text-foreground">{title}</h3>
+            <p className="text-muted-foreground text-center">{description}</p>
         </motion.div>
     );
 };
 
 const AboutUsSection = () => {
     return (
-        <div className="min-h-screen bg-[#030303] mt-[4rem] p-4 sm:p-10 text-white flex flex-1 flex-col">
+        <div className="min-h-screen mt-[4rem] p-4 sm:p-10 text-foreground flex flex-1 flex-col">
             {/* Header - Adjusted margins */}
-            <div className="text-xl text-white ml-4 sm:ml-[5rem] mb-8 sm:mb-12">
+            <div className="text-xl text-foreground ml-4 sm:ml-[5rem] mb-8 sm:mb-12">
                 <h1 className="text-2xl sm:text-3xl font-bold">About Us</h1>
             </div>
 
@@ -52,7 +52,7 @@ const AboutUsSection = () => {
                     viewport={{ once: true, amount: 0.3 }}
                 >
                     <motion.h2
-                        className="text-xl sm:text-2xl font-semibold text-white mb-4"
+                        className="text-xl sm:text-2xl font-semibold text-foreground mb-4"
                         variants={{
                             hidden: { opacity: 0, y: 20 },
                             visible: { opacity: 1, y: 0 },
@@ -64,7 +64,7 @@ const AboutUsSection = () => {
                         Empowering Creativity, Redefining Possibilities.
                     </motion.h2>
                     <motion.p
-                        className="text-[#858192] text-sm sm:text-base leading-[24px] sm:leading-[30px]"
+                        className="text-muted-foreground text-sm sm:text-base leading-[24px] sm:leading-[30px]"
                         variants={{
                             hidden: { opacity: 0, y: 20 },
                             visible: { opacity: 1, y: 0 },
@@ -88,7 +88,7 @@ const AboutUsSection = () => {
                     transition={{ duration: 0.8, ease: 'easeOut' }}
                     viewport={{ once: true, amount: 0.3 }}
                 >
-                    <video className="w-full rounded-xl shadow-lg border border-purple-900/20" autoPlay loop muted playsInline>
+                    <video className="w-full rounded-xl shadow-lg border border-border" autoPlay loop muted playsInline>
                         <source src="/Document.webm" type="video/webm" />
                         Your browser does not support the video tag.
                     </video>
@@ -99,7 +99,7 @@ const AboutUsSection = () => {
             <div className="flex justify-center items-center my-20"></div>
 
             {/* Mission & Vision section - Adjusted alignment and spacing */}
-            <div className="text-xl text-white mr-4 sm:mr-[20rem] mb-8 sm:mb-12 self-end">
+            <div className="text-xl text-foreground mr-4 sm:mr-[20rem] mb-8 sm:mb-12 self-end">
                 <h1 className="text-2xl sm:text-3xl font-bold">Our Mission & Vision</h1>
             </div>
 
@@ -115,7 +115,7 @@ const AboutUsSection = () => {
                     viewport={{ once: true, amount: 0.3 }}
                 >
                     <motion.h2
-                        className="text-2xl font-semibold text-white mb-4"
+                        className="text-2xl font-semibold text-foreground mb-4"
                         variants={{
                             hidden: { opacity: 0, y: 20 },
                             visible: { opacity: 1, y: 0 },
@@ -127,7 +127,7 @@ const AboutUsSection = () => {
                         AI-Powered Innovation for Limitless Creativity.
                     </motion.h2>
                     <motion.p
-                        className="text-[#858192] text-base leading-[30px]"
+                        className="text-muted-foreground text-base leading-[30px]"
                         variants={{
                             hidden: { opacity: 0, y: 20 },
                             visible: { opacity: 1, y: 0 },
@@ -151,7 +151,7 @@ const AboutUsSection = () => {
                     transition={{ duration: 0.8, ease: 'easeOut' }}
                     viewport={{ once: true, amount: 0.3 }}
                 >
-                    <video className="w-full rounded-xl shadow-lg border border-purple-900/20" autoPlay loop muted playsInline>
+                    <video className="w-full rounded-xl shadow-lg border border-border" autoPlay loop muted playsInline>
                         <source src="/Vision.webm" type="video/webm" />
                         Your browser does not support the video tag.
                     </video>
@@ -166,10 +166,10 @@ const AboutUsSection = () => {
                     transition={{ duration: 0.6 }}
                     viewport={{ once: true }}
                 >
-                    <h2 className="text-2xl sm:text-3xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500">
+                    <h2 className="text-2xl sm:text-3xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80">
                         Powerful Features
                     </h2>
-                    <p className="text-[#858192] text-sm sm:text-base max-w-2xl mx-auto">
+                    <p className="text-muted-foreground text-sm sm:text-base max-w-2xl mx-auto">
                         Our platform offers a comprehensive suite of tools designed to streamline your creative workflow
                     </p>
                 </motion.div>
@@ -178,7 +178,7 @@ const AboutUsSection = () => {
             </div>
 
             {/* FAQ Section - Adjusted padding and width */}
-            <div className="py-12 sm:py-24 px-4 sm:px-5 bg-[#050505] rounded-xl max-w-[95%] sm:max-w-6xl mx-auto w-full mb-8 sm:mb-16">
+            <div className="py-12 sm:py-24 px-4 sm:px-5 bg-card rounded-xl max-w-[95%] sm:max-w-6xl mx-auto w-full mb-8 sm:mb-16">
                 <motion.div
                     className="text-center mb-8 sm:mb-16"
                     initial={{ opacity: 0, y: 20 }}
@@ -186,8 +186,8 @@ const AboutUsSection = () => {
                     transition={{ duration: 0.6 }}
                     viewport={{ once: true }}
                 >
-                    <h2 className="text-2xl sm:text-4xl font-bold mb-3 text-white">Frequently Asked Questions</h2>
-                    <p className="text-[#858192] text-sm sm:text-base max-w-2xl mx-auto">
+                    <h2 className="text-2xl sm:text-4xl font-bold mb-3 text-foreground">Frequently Asked Questions</h2>
+                    <p className="text-muted-foreground text-sm sm:text-base max-w-2xl mx-auto">
                         Find answers to the most common questions about our platform
                     </p>
                 </motion.div>
@@ -200,39 +200,39 @@ const AboutUsSection = () => {
                     viewport={{ once: true }}
                 >
                     <Accordion type="single" collapsible className="w-full">
-                        <AccordionItem value="item-1" className="border-b border-purple-900/20">
-                            <AccordionTrigger className="text-white hover:text-purple-400 text-base sm:text-lg">
+                        <AccordionItem value="item-1" className="border-b border-border">
+                            <AccordionTrigger className="text-foreground hover:text-primary text-base sm:text-lg">
                                 How does the AI assistant work?
                             </AccordionTrigger>
-                            <AccordionContent className="text-[#858192] text-sm sm:text-base">
+                            <AccordionContent className="text-muted-foreground text-sm sm:text-base">
                                 Our AI assistant analyzes your project needs and creative direction to offer intelligent
                                 suggestions, streamline workflows, and help overcome technical obstacles that might slow down your
                                 creative process.
                             </AccordionContent>
                         </AccordionItem>
-                        <AccordionItem value="item-2" className="border-b border-purple-900/20">
-                            <AccordionTrigger className="text-white hover:text-purple-400 text-base sm:text-lg">
+                        <AccordionItem value="item-2" className="border-b border-border">
+                            <AccordionTrigger className="text-foreground hover:text-primary text-base sm:text-lg">
                                 Is my data secure on your platform?
                             </AccordionTrigger>
-                            <AccordionContent className="text-[#b3afc0] text-sm sm:text-base">
+                            <AccordionContent className="text-muted-foreground text-sm sm:text-base">
                                 Absolutely. We employ enterprise-grade encryption and security protocols to ensure that all your
                                 creative assets and data remain private and protected at all times.
                             </AccordionContent>
                         </AccordionItem>
-                        <AccordionItem value="item-3" className="border-b border-purple-900/20">
-                            <AccordionTrigger className="text-white hover:text-purple-400 text-base sm:text-lg">
+                        <AccordionItem value="item-3" className="border-b border-border">
+                            <AccordionTrigger className="text-foreground hover:text-primary text-base sm:text-lg">
                                 Can I collaborate with my team in real-time?
                             </AccordionTrigger>
-                            <AccordionContent className="text-[#858192] text-sm sm:text-base">
+                            <AccordionContent className="text-muted-foreground text-sm sm:text-base">
                                 Yes, our platform is built for seamless collaboration. Multiple team members can work
                                 simultaneously on projects with changes synced in real-time, regardless of location.
                             </AccordionContent>
                         </AccordionItem>
-                        <AccordionItem value="item-4" className="border-b border-purple-900/20">
-                            <AccordionTrigger className="text-white hover:text-purple-400 text-base sm:text-lg">
+                        <AccordionItem value="item-4" className="border-b border-border">
+                            <AccordionTrigger className="text-foreground hover:text-primary text-base sm:text-lg">
                                 What type of creative projects can I use this for?
                             </AccordionTrigger>
-                            <AccordionContent className="text-[#858192] text-sm sm:text-base">
+                            <AccordionContent className="text-muted-foreground text-sm sm:text-base">
                                 Our platform is versatile and supports a wide range of creative projects including film
                                 production, digital content creation, interactive media, and more.
                             </AccordionContent>
@@ -243,19 +243,19 @@ const AboutUsSection = () => {
 
             {/* Get Started Section - Adjusted padding and responsive button */}
             <motion.div
-                className="py-12 sm:py-20 px-4 sm:px-5 my-8 sm:my-16 bg-gradient-to-r from-purple-900/20 to-blue-900/20 rounded-2xl max-w-[95%] sm:max-w-6xl mx-auto text-center"
+                className="py-12 sm:py-20 px-4 sm:px-5 my-8 sm:my-16 bg-gradient-to-r from-primary/5 to-primary/10 rounded-2xl max-w-[95%] sm:max-w-6xl mx-auto text-center"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
                 viewport={{ once: true }}
             >
-                <h2 className="text-2xl sm:text-4xl font-bold mb-4 sm:mb-6 text-white">
+                <h2 className="text-2xl sm:text-4xl font-bold mb-4 sm:mb-6 text-foreground">
                     Ready to Transform Your Creative Process?
                 </h2>
-                <p className="text-[#858192] text-sm sm:text-base max-w-2xl mx-auto mb-6 sm:mb-8">
+                <p className="text-muted-foreground text-sm sm:text-base max-w-2xl mx-auto mb-6 sm:mb-8">
                     Join thousands of creators who are already using our platform to bring their ideas to life.
                 </p>
-                <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-4 sm:py-6 px-6 sm:px-8 rounded-lg text-base sm:text-lg transition-all transform hover:scale-105">
+                <Button className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-semibold py-4 sm:py-6 px-6 sm:px-8 rounded-lg text-base sm:text-lg transition-all transform hover:scale-105">
                     Get Started Now
                     <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>

@@ -63,7 +63,7 @@ export default function LoginPage() {
 
 
   return (
-    <div className="min-h-screen bg-[#030303] flex flex-col justify-center items-center p-4">
+    <div className="min-h-screen   flex flex-col justify-center items-center p-4">
       <Link
         href="/"
         className="absolute top-8 left-8 text-white text-xl font-bold"
