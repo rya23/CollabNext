@@ -1,8 +1,8 @@
-import Whiteboard from '@/components/WhiteBoard';
+import Whiteboard from '@/components/Whiteboard';
 import React from 'react';
 
 const whiteboard = () => {
-    return 0;
+    return <Whiteboard />;
 };
 
 export default whiteboard;
