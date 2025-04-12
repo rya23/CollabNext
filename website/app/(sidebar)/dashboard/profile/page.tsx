@@ -19,7 +19,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, Pencil } from "lucide-react";
+import { Link2, Loader2, Pencil } from "lucide-react";
 import { getSession } from "@/app/actions/auth";
 import {
   Dialog,
@@ -30,6 +30,13 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/use-toast";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Twitter, Facebook, Linkedin, Mail, Copy, Check } from "lucide-react";
+import Head from "next/head";
 
 // Mock activity data - replace with actual API calls
 const mockActivityData = [
@@ -83,6 +90,7 @@ const ProfilePage = () => {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [userImage, setUserImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCopied, setIsCopied] = useState(false);
 
   // Activity data state
   const [activityData, setActivityData] = useState(mockActivityData);
@@ -268,8 +276,110 @@ const ProfilePage = () => {
     );
   }
 
+  // Add this function to handle sharing
+  const handleShare = (platform: string) => {
+    // Get the profile URL - in a real app, generate a shareable link
+    const profileUrl = `https://nuclitron.science/profile/${userData.username}`;
+
+    // Create a more immersive share text with achievements and stats
+    const shareText = `Discover ${userData.name}'s groundbreaking nuclear physics research at Nuclitron! With ${userData.stats.experiments} experiments, ${userData.stats.publications} publications, and collaborations across ${userData.stats.collaborations} research teams. Join the frontier of particle physics!`;
+
+    // Shorter text for platforms with character limits
+    const shortShareText = `Explore ${userData.name}'s nuclear physics research: ${userData.stats.experiments} experiments, ${userData.stats.publications} publications at Nuclitron!`;
+
+    // In production, the shared URL should have proper Open Graph meta tags
+    // for the user's profile image and description
+
+    let shareUrl = "";
+
+    switch (platform) {
+      case "twitter":
+        // Twitter has character limits, use shorter text
+        shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+          shortShareText
+        )}&url=${encodeURIComponent(profileUrl)}`;
+        break;
+      case "facebook":
+        // Facebook uses Open Graph tags for images, but we can still customize the text
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+          profileUrl
+        )}&quote=${encodeURIComponent(shareText)}`;
+        break;
+      case "linkedin":
+        // LinkedIn also uses Open Graph, we can pass some text
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+          profileUrl
+        )}&summary=${encodeURIComponent(shareText)}`;
+        break;
+      case "email":
+        // For email, we can create a more detailed message body
+        const emailBody = `
+  ${shareText}
+  
+  Research Focus: Nuclear physics and particle acceleration
+  Latest Achievement: ${recentActivities[0]?.name || "Neutron Flux Analysis"}
+  
+  View the complete profile and research portfolio: ${profileUrl}
+  
+  --
+  Shared from Nuclitron Science Platform
+        `;
+
+        shareUrl = `mailto:?subject=${encodeURIComponent(
+          `${userData.name}'s Nuclitron Research Profile`
+        )}&body=${encodeURIComponent(emailBody)}`;
+        break;
+      case "copy":
+        // When copying, include the rich text description
+        navigator.clipboard
+          .writeText(`${shareText}\n\n${profileUrl}`)
+          .then(() => {
+            setIsCopied(true);
+            setTimeout(() => setIsCopied(false), 2000);
+          });
+        toast({
+          title: "Profile link copied!",
+          description: "Share link and description copied to clipboard",
+          variant: "default",
+        });
+        return;
+    }
+
+    // Track sharing analytics in a real implementation
+    // logSharingEvent(platform, userData.username);
+
+    // Open share URL in a new window
+    if (shareUrl) {
+      window.open(shareUrl, "_blank", "noopener,noreferrer");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#101828] text-gray-100">
+      <Head>
+        <title>{userData.name} | Nuclitron Research Profile</title>
+        <meta
+          property="og:title"
+          content={`${userData.name} | Nuclitron Research`}
+        />
+        <meta
+          property="og:description"
+          content={`View ${userData.name}'s research profile with ${userData.stats.experiments} experiments and ${userData.stats.publications} publications`}
+        />
+        <meta
+          property="og:image"
+          content={
+            userData.avatar ||
+            "https://nuclitron.science/default-profile-image.jpg"
+          }
+        />
+        <meta
+          property="og:url"
+          content={`https://nuclitron.science/profile/${userData.username}`}
+        />
+        <meta property="og:type" content="profile" />
+        <meta name="twitter:card" content="summary_large_image" />
+      </Head>
       <div className="container mx-auto p-6 space-y-8">
         <h1 className="text-3xl font-bold mb-6 text-white">User Profile</h1>
 
@@ -339,12 +449,89 @@ const ProfilePage = () => {
                 </div>
               </div>
 
-              <Button
-                variant="outline"
-                className="ml-auto bg-[#344054] text-white border-[#475569] hover:bg-[#475569] hover:text-white"
-              >
-                Edit Profile
-              </Button>
+              <div className="flex flex-col gap-3 p-3 items-center justify-center ">
+                <Button
+                  variant="outline"
+                  className="ml-auto bg-[#344054] text-white border-[#475569] hover:bg-[#475569] hover:text-white"
+                >
+                  Edit Profile
+                </Button>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="ml-auto mx-2 bg-[#344054] text-white border-[#475569] hover:bg-[#475569] hover:text-white"
+                    >
+                      <Link2 className="mr-2" /> Share Profile
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-56 bg-[#1D2939] border-[#334155] text-white p-2">
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-medium pl-2 pb-2 border-b border-[#334155]">
+                        Share via
+                      </h4>
+
+                      <div className="grid gap-1">
+                        <Button
+                          variant="ghost"
+                          className="flex items-center justify-start hover:bg-[#344054] text-[#1DA1F2]"
+                          onClick={() => handleShare("twitter")}
+                        >
+                          <Twitter className="mr-2 h-4 w-4" />
+                          <span>Twitter</span>
+                        </Button>
+
+                        <Button
+                          variant="ghost"
+                          className="flex items-center justify-start hover:bg-[#344054] text-[#4267B2]"
+                          onClick={() => handleShare("facebook")}
+                        >
+                          <Facebook className="mr-2 h-4 w-4" />
+                          <span>Facebook</span>
+                        </Button>
+
+                        <Button
+                          variant="ghost"
+                          className="flex items-center justify-start hover:bg-[#344054] text-[#0A66C2]"
+                          onClick={() => handleShare("linkedin")}
+                        >
+                          <Linkedin className="mr-2 h-4 w-4" />
+                          <span>LinkedIn</span>
+                        </Button>
+
+                        <Button
+                          variant="ghost"
+                          className="flex items-center justify-start hover:bg-[#344054] text-gray-300"
+                          onClick={() => handleShare("email")}
+                        >
+                          <Mail className="mr-2 h-4 w-4" />
+                          <span>Email</span>
+                        </Button>
+
+                        <Separator className="my-1 bg-[#334155]" />
+
+                        <Button
+                          variant="ghost"
+                          className="flex items-center justify-start hover:bg-[#344054] text-gray-300"
+                          onClick={() => handleShare("copy")}
+                        >
+                          {isCopied ? (
+                            <>
+                              <Check className="mr-2 h-4 w-4 text-green-500" />
+                              <span>Copied!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="mr-2 h-4 w-4" />
+                              <span>Copy link</span>
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
           </CardContent>
         </Card>
