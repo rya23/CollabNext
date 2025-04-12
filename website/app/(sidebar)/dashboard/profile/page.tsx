@@ -84,7 +84,6 @@ const recentActivities = [
 const ProfilePage = () => {
   // State for user session data
   const [userId, setUserId] = useState<string | null>(null);
-  // Add this with your other state variables
   const [isConverting, setIsConverting] = useState<boolean | null>(false);
   const [userName, setUserName] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -102,41 +101,21 @@ const ProfilePage = () => {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Add to your component, below handleAvatarUpload function
   const convertToGhibliStyle = async () => {
-    // Only proceed if there's an image to convert
     if (!avatarPreview && !userData.avatar) return;
 
     try {
-      // Show loading state
       setIsConverting(true);
-
-      // Get the source image (either preview or current avatar)
       const sourceImage = avatarPreview || userData.avatar;
 
-      // In a real implementation, you would call an AI service API
-      // Example with a hypothetical API:
-      // const response = await fetch('https://api.example.com/ghibli-converter', {
-      //   method: 'POST',
-      //   body: JSON.stringify({ imageUrl: sourceImage }),
-      //   headers: { 'Content-Type': 'application/json' }
-      // });
-      // const data = await response.json();
-      // setAvatarPreview(data.convertedImageUrl);
-
-      // For demo purposes, we'll just simulate a delay
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      // Since we don't have the actual API, just show a success message
       toast({
         title: "Image converted",
         description:
           "Your image has been converted to Ghibli art style. This is a demo - in a real app, this would call an AI image conversion API.",
         variant: "default",
       });
-
-      // In a real app, you'd set the new image from the API response
-      // For demo purposes, we'll keep the original image
     } catch (error) {
       console.error("Conversion error:", error);
       toast({
@@ -150,34 +129,18 @@ const ProfilePage = () => {
     }
   };
 
-  // Check authentication and get user data
   useEffect(() => {
     async function checkAuth() {
       try {
-        console.log("Checking authentication status...");
         const session = await getSession();
-        console.log(
-          "Session details:",
-          session
-            ? {
-                hasUser: !!session.user,
-                hasId: !!session.user?.id,
-                hasEmail: !!session.user?.email,
-                hasName: !!session.user?.name,
-              }
-            : "No session"
-        );
 
         if (session?.user) {
-          // Handle possible undefined values with nullish coalescing
           let id = session.user.id || session.user.email || null;
 
-          // Normalize email addresses for consistent lookup
           if (id && id.includes("@")) {
             id = id.toLowerCase();
           }
 
-          console.log("Setting user ID to:", id);
           setUserId(id);
           setUserName(session.user.name || null);
           setUserEmail(
@@ -185,11 +148,7 @@ const ProfilePage = () => {
           );
           setUserImage(session.user.image || null);
           setIsLoading(false);
-
-          // Here you would fetch user profile data from your API/database
-          // fetchUserProfile(id);
         } else {
-          console.log("No authenticated user found");
           setIsLoading(false);
         }
       } catch (error) {
@@ -201,7 +160,6 @@ const ProfilePage = () => {
     checkAuth();
   }, []);
 
-  // Get user initials for avatar fallback
   const getInitials = (name: string | null) => {
     if (!name) return "U";
     const names = name.split(" ");
@@ -211,7 +169,6 @@ const ProfilePage = () => {
     return name.substring(0, 2).toUpperCase();
   };
 
-  // Add this function to handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -224,24 +181,12 @@ const ProfilePage = () => {
     }
   };
 
-  // Add this function to handle avatar upload
   const handleAvatarUpload = async () => {
     if (!avatarFile) return;
 
-    // In a real app, you would upload the file to your storage service
-    // Example:
-    // const formData = new FormData();
-    // formData.append("avatar", avatarFile);
-    // const response = await fetch("/api/user/avatar", {
-    //   method: "POST",
-    //   body: formData
-    // });
-
-    // For now, we'll just update the local state
     setUserImage(avatarPreview);
     setIsAvatarDialogOpen(false);
 
-    // Show success message
     toast({
       title: "Avatar updated",
       description: "Your profile picture has been updated successfully.",
@@ -249,13 +194,12 @@ const ProfilePage = () => {
     });
   };
 
-  // Build user data object for display
   const userData = {
     name: userName || "Nuclitron User",
     username: userEmail ? userEmail.split("@")[0] : "user",
     email: userEmail || "No email provided",
-    joinDate: "April 2023", // You might want to store this in your database
-    bio: "Nuclear physics enthusiast and researcher at Nuclitron.", // This could come from a user profile API
+    joinDate: "April 2023",
+    bio: "Nuclear physics enthusiast and researcher at Nuclitron.",
     avatar: userImage,
     stats: {
       experiments: 24,
@@ -264,7 +208,6 @@ const ProfilePage = () => {
     },
   };
 
-  // Show loading state
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
@@ -276,43 +219,30 @@ const ProfilePage = () => {
     );
   }
 
-  // Add this function to handle sharing
   const handleShare = (platform: string) => {
-    // Get the profile URL - in a real app, generate a shareable link
     const profileUrl = `https://nuclitron.science/profile/${userData.username}`;
-
-    // Create a more immersive share text with achievements and stats
     const shareText = `Discover ${userData.name}'s groundbreaking nuclear physics research at Nuclitron! With ${userData.stats.experiments} experiments, ${userData.stats.publications} publications, and collaborations across ${userData.stats.collaborations} research teams. Join the frontier of particle physics!`;
-
-    // Shorter text for platforms with character limits
     const shortShareText = `Explore ${userData.name}'s nuclear physics research: ${userData.stats.experiments} experiments, ${userData.stats.publications} publications at Nuclitron!`;
-
-    // In production, the shared URL should have proper Open Graph meta tags
-    // for the user's profile image and description
 
     let shareUrl = "";
 
     switch (platform) {
       case "twitter":
-        // Twitter has character limits, use shorter text
         shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
           shortShareText
         )}&url=${encodeURIComponent(profileUrl)}`;
         break;
       case "facebook":
-        // Facebook uses Open Graph tags for images, but we can still customize the text
         shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
           profileUrl
         )}&quote=${encodeURIComponent(shareText)}`;
         break;
       case "linkedin":
-        // LinkedIn also uses Open Graph, we can pass some text
         shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
           profileUrl
         )}&summary=${encodeURIComponent(shareText)}`;
         break;
       case "email":
-        // For email, we can create a more detailed message body
         const emailBody = `
   ${shareText}
   
@@ -330,7 +260,6 @@ const ProfilePage = () => {
         )}&body=${encodeURIComponent(emailBody)}`;
         break;
       case "copy":
-        // When copying, include the rich text description
         navigator.clipboard
           .writeText(`${shareText}\n\n${profileUrl}`)
           .then(() => {
@@ -345,10 +274,6 @@ const ProfilePage = () => {
         return;
     }
 
-    // Track sharing analytics in a real implementation
-    // logSharingEvent(platform, userData.username);
-
-    // Open share URL in a new window
     if (shareUrl) {
       window.open(shareUrl, "_blank", "noopener,noreferrer");
     }
@@ -356,35 +281,12 @@ const ProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Head>
-        <title>{userData.name} | Nuclitron Research Profile</title>
-        <meta
-          property="og:title"
-          content={`${userData.name} | Nuclitron Research`}
-        />
-        <meta
-          property="og:description"
-          content={`View ${userData.name}'s research profile with ${userData.stats.experiments} experiments and ${userData.stats.publications} publications`}
-        />
-        <meta
-          property="og:image"
-          content={
-            userData.avatar ||
-            "https://nuclitron.science/default-profile-image.jpg"
-          }
-        />
-        <meta
-          property="og:url"
-          content={`https://nuclitron.science/profile/${userData.username}`}
-        />
-        <meta property="og:type" content="profile" />
-        <meta name="twitter:card" content="summary_large_image" />
-      </Head>
-      <div className="container mx-auto p-6 space-y-8">
-        <h1 className="text-3xl font-bold mb-6 text-foreground">User Profile</h1>
+      <div className="texture"></div>
 
-        {/* Profile Header */}
-        <Card className="mb-6 bg-card border-border shadow-lg">
+      <div className="container mx-auto p-6 space-y-8">
+        <h1 className="text-3xl font-bold mb-6 text-primary">User Profile</h1>
+
+        <Card className="mb-6 bg-card border-border shadow-primary">
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
               <div className="relative">
@@ -395,56 +297,53 @@ const ProfilePage = () => {
                       alt={userData.name}
                     />
                   ) : (
-                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white text-2xl">
+                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-black text-2xl">
                       {getInitials(userData.name)}
                     </AvatarFallback>
                   )}
                 </Avatar>
 
-                {/* Edit icon overlay */}
                 <div
-                  className="absolute -bottom-2 -right-2 w-8 h-8 bg-[#344054] rounded-full flex items-center justify-center cursor-pointer border-2 border-[#1a2234] hover:bg-[#475569] transition-colors duration-200"
+                  className="absolute -bottom-2 -right-2 w-8 h-8 bg-secondary rounded-full flex items-center justify-center cursor-pointer border-2 border-border hover:bg-accent transition-colors duration-200"
                   onClick={() => setIsAvatarDialogOpen(true)}
                 >
-                  <Pencil className="w-3 h-3 text-white" />
+                  <Pencil className="w-3 h-3 text-secondary-foreground" />
                 </div>
               </div>
 
               <div className="space-y-2 flex-1">
                 <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-                  <h2 className="text-2xl font-bold text-white">
+                  <h2 className="text-2xl font-bold text-primary">
                     {userData.name}
                   </h2>
                   <Badge
                     variant="outline"
-                    className="w-fit bg-[#344054] text-gray-300 border-[#475569]"
+                    className="w-fit bg-secondary text-secondary-foreground border-border"
                   >
                     @{userData.username}
                   </Badge>
                 </div>
-                <p className="text-gray-300">{userData.bio}</p>
-                <p className="text-sm text-gray-400">
-                  Member since {userData.joinDate}
-                </p>
+                <p className="text-xl text-[#575757]">{userData.bio}</p>
+                <p className="text-sm text-[#575757] ">Member since {userData.joinDate}</p>
 
                 <div className="flex gap-4 mt-3">
                   <div>
-                    <p className="font-semibold text-white">
+                    <p className="font-semibold text-primary">
                       {userData.stats.experiments}
                     </p>
-                    <p className="text-sm text-gray-400">Experiments</p>
+                    <p className="text-sm text-[#575757]">Experiments</p>
                   </div>
                   <div>
-                    <p className="font-semibold text-white">
+                    <p className="font-semibold text-primary">
                       {userData.stats.publications}
                     </p>
-                    <p className="text-sm text-gray-400">Publications</p>
+                    <p className="text-sm text-[#575757]">Publications</p>
                   </div>
                   <div>
-                    <p className="font-semibold text-white">
+                    <p className="font-semibold text-primary">
                       {userData.stats.collaborations}
                     </p>
-                    <p className="text-sm text-gray-400">Collaborations</p>
+                    <p className="text-sm text-[#575757]">Collaborations</p>
                   </div>
                 </div>
               </div>
@@ -452,7 +351,7 @@ const ProfilePage = () => {
               <div className="flex flex-col gap-3 p-3 items-center justify-center ">
                 <Button
                   variant="outline"
-                  className="ml-auto bg-[#344054] text-white border-[#475569] hover:bg-[#475569] hover:text-white"
+                  className="ml-auto bg-secondary text-secondary-foreground border-border hover:bg-accent hover:text-accent-foreground"
                 >
                   Edit Profile
                 </Button>
@@ -460,21 +359,21 @@ const ProfilePage = () => {
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className="ml-auto mx-2 bg-[#344054] text-white border-[#475569] hover:bg-[#475569] hover:text-white"
+                      className="ml-auto mx-2 bg-secondary text-secondary-foreground border-border hover:bg-accent hover:text-accent-foreground"
                     >
                       <Link2 className="mr-2" /> Share Profile
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-56 bg-card border-border text-foreground p-2">
+                  <PopoverContent className="w-56 bg-popover border-border text-popover-foreground p-2">
                     <div className="space-y-2">
-                      <h4 className="text-sm font-medium pl-2 pb-2 border-b border-[#334155]">
+                      <h4 className="text-sm font-medium pl-2 pb-2 border-b border-border">
                         Share via
                       </h4>
 
                       <div className="grid gap-1">
                         <Button
                           variant="ghost"
-                          className="flex items-center justify-start hover:bg-[#344054] text-[#1DA1F2]"
+                          className="flex items-center justify-start hover:bg-secondary text-twitter"
                           onClick={() => handleShare("twitter")}
                         >
                           <Twitter className="mr-2 h-4 w-4" />
@@ -483,7 +382,7 @@ const ProfilePage = () => {
 
                         <Button
                           variant="ghost"
-                          className="flex items-center justify-start hover:bg-[#344054] text-[#4267B2]"
+                          className="flex items-center justify-start hover:bg-secondary text-facebook"
                           onClick={() => handleShare("facebook")}
                         >
                           <Facebook className="mr-2 h-4 w-4" />
@@ -492,7 +391,7 @@ const ProfilePage = () => {
 
                         <Button
                           variant="ghost"
-                          className="flex items-center justify-start hover:bg-[#344054] text-[#0A66C2]"
+                          className="flex items-center justify-start hover:bg-secondary text-linkedin"
                           onClick={() => handleShare("linkedin")}
                         >
                           <Linkedin className="mr-2 h-4 w-4" />
@@ -501,23 +400,23 @@ const ProfilePage = () => {
 
                         <Button
                           variant="ghost"
-                          className="flex items-center justify-start hover:bg-[#344054] text-gray-300"
+                          className="flex items-center justify-start hover:bg-secondary text-email"
                           onClick={() => handleShare("email")}
                         >
                           <Mail className="mr-2 h-4 w-4" />
                           <span>Email</span>
                         </Button>
 
-                        <Separator className="my-1 bg-[#334155]" />
+                        <Separator className="my-1 bg-border" />
 
                         <Button
                           variant="ghost"
-                          className="flex items-center justify-start hover:bg-[#344054] text-gray-300"
+                          className="flex items-center justify-start hover:bg-secondary text-copy"
                           onClick={() => handleShare("copy")}
                         >
                           {isCopied ? (
                             <>
-                              <Check className="mr-2 h-4 w-4 text-green-500" />
+                              <Check className="mr-2 h-4 w-4 text-success" />
                               <span>Copied!</span>
                             </>
                           ) : (
@@ -536,12 +435,11 @@ const ProfilePage = () => {
           </CardContent>
         </Card>
 
-        {/* Avatar Edit Dialog */}
         <Dialog open={isAvatarDialogOpen} onOpenChange={setIsAvatarDialogOpen}>
           <DialogContent className="bg-card border-border text-foreground">
             <DialogHeader>
               <DialogTitle>Update Profile Picture</DialogTitle>
-              <DialogDescription className="text-gray-400">
+              <DialogDescription className="text-[#575757]">
                 Choose a new avatar image for your profile.
               </DialogDescription>
             </DialogHeader>
@@ -550,9 +448,9 @@ const ProfilePage = () => {
               <div className="relative h-36 w-36">
                 <Avatar className="h-full w-full border-4 border-primary/20">
                   {isConverting ? (
-                    <div className="absolute inset-0 flex items-center justify-center bg-[#1D2939]/70 rounded-full">
+                    <div className="absolute inset-0 flex items-center justify-center bg-card/70 rounded-full">
                       <svg
-                        className="animate-spin h-10 w-10 text-indigo-400"
+                        className="animate-spin h-10 w-10 text-primary"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -571,7 +469,7 @@ const ProfilePage = () => {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         ></path>
                       </svg>
-                      <span className="absolute text-xs text-white font-medium mt-12">
+                      <span className="absolute text-xs text-foreground font-medium mt-12">
                         Converting...
                       </span>
                     </div>
@@ -582,7 +480,7 @@ const ProfilePage = () => {
                       className="object-cover"
                     />
                   ) : (
-                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white text-4xl">
+                    <AvatarFallback className="bg-gradient-to-br from-primary to-secondary text-foreground text-4xl">
                       {getInitials(userData.name)}
                     </AvatarFallback>
                   )}
@@ -592,7 +490,7 @@ const ProfilePage = () => {
               <div className="grid w-full max-w-sm items-center gap-1.5">
                 <label
                   htmlFor="avatar-upload"
-                  className="cursor-pointer py-2 px-4 rounded-md bg-[#344054] hover:bg-[#475569] text-white text-center transition-colors"
+                  className="cursor-pointer py-2 px-4 rounded-md bg-secondary hover:bg-accent text-secondary-foreground text-center transition-colors"
                 >
                   Select Image
                 </label>
@@ -605,11 +503,10 @@ const ProfilePage = () => {
                   className="hidden"
                 />
 
-                {/* Ghibli Art Style Conversion Button */}
                 <Button
                   onClick={convertToGhibliStyle}
                   disabled={!avatarPreview && !userData.avatar}
-                  className="mt-2 bg-gradient-to-r from-[#52307c] to-[#663a82] hover:from-[#623b94] hover:to-[#7a459c] text-white relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="mt-2 bg-gradient-to-r from-primary to-secondary hover:from-accent hover:to-accent-foreground text-foreground relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <span className="absolute inset-0 bg-[url('/ghibli-pattern.png')] opacity-10 bg-repeat group-hover:opacity-20 transition-opacity"></span>
                   <span className="flex items-center">
@@ -652,7 +549,7 @@ const ProfilePage = () => {
                   </span>
                 </Button>
 
-                <p className="text-xs text-gray-400 text-center">
+                <p className="text-xs text-[#575757] text-center">
                   JPG, PNG or GIF. Max size 2MB.
                 </p>
               </div>
@@ -666,14 +563,14 @@ const ProfilePage = () => {
                   setAvatarFile(null);
                   setIsAvatarDialogOpen(false);
                 }}
-                className="border-[#475569] text-[#344054] hover:text-[#344054] cursor-pointer"
+                className="border-border text-secondary hover:text-secondary cursor-pointer"
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleAvatarUpload}
                 disabled={!avatarFile}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                className="bg-primary hover:bg-accent text-foreground"
               >
                 Save Changes
               </Button>
@@ -681,99 +578,87 @@ const ProfilePage = () => {
           </DialogContent>
         </Dialog>
 
-        {/* Activity Tracking Tabs */}
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="grid grid-cols-3 mb-6 bg-card">
             <TabsTrigger
               value="overview"
-              className="data-[state=active]:bg-secondary data-[state=active]:text-foreground"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               Overview
             </TabsTrigger>
             <TabsTrigger
               value="activity"
-              className="data-[state=active]:bg-secondary data-[state=active]:text-foreground"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               Activity
             </TabsTrigger>
             <TabsTrigger
               value="stats"
-              className="data-[state=active]:bg-secondary data-[state=active]:text-foreground"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               Statistics
             </TabsTrigger>
           </TabsList>
 
-          {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            <Card className="bg-card border-border shadow-lg py-3">
+            <Card className="bg-card border-border shadow-primary">
               <CardContent className="p-6">
-                <h3 className="text-xl font-semibold mb-4 text-white">
+                <h3 className="text-xl font-semibold mb-4 text-primary">
                   Activity Overview
                 </h3>
                 <ResponsiveContainer width="100%" height={300}>
                   <div className="w-full p-4">
-                    <h3 className="text-xl font-semibold mb-4 text-white">
+                    <h3 className="text-xl font-semibold mb-4 text-primary">
                       Activity Contributions
                     </h3>
                     <div className="flex items-center justify-between mb-4">
-                      <div className="text-sm text-gray-400 mb-5">
+                      <div className="text-sm text-[#575757] mb-5">
                         April 2024 - April 2025
                       </div>
                       <div className="flex items-center space-x-2">
-                        <span className="text-xs text-gray-400">Less</span>
+                        <span className="text-xs text-[#575757]">Less</span>
                         <div className="flex items-center space-x-1">
                           {[
-                            "#1e293b", // No activity - dark background similar to GitHub dark mode
-                            "#0e4429", // Low activity - dark green
-                            "#006d32", // Medium-low activity - medium green
-                            "#26a641", // Medium activity - bright green
-                            "#39d353", // High activity - vibrant green
+                            "var(--color-muted)", // No activity
+                            "var(--color-chart-1)", // Low activity
+                            "var(--color-chart-2)", // Medium-low activity
+                            "var(--color-chart-3)", // Medium activity
+                            "var(--color-chart-4)", // High activity
                           ].map((color, i) => (
                             <div
                               key={i}
-                              className="w-3 h-3 rounded-sm border border-[#0f172a]/30"
+                              className="w-3 h-3 rounded-sm border border-border"
                               style={{ backgroundColor: color }}
                             />
                           ))}
                         </div>
-                        <span className="text-xs text-gray-400">More</span>
+                        <span className="text-xs text-[#575757]">More</span>
                       </div>
                     </div>
 
-                    <div className="relative w-full h-full border border-[#334155] rounded-md p-4 bg-[#1a2234]">
-                      {/* Activity Grid */}
+                    <div className="relative w-full h-full border border-border rounded-md p-4 bg-card">
                       <div className="grid grid-cols-53 gap-1">
-                        {/* Days of Week Labels */}
                         <div className="col-span-1 grid grid-rows-7 gap-1 pr-2">
-                          {[
-                            "Sun",
-                            "Mon",
-                            "Tue",
-                            "Wed",
-                            "Thu",
-                            "Fri",
-                            "Sat",
-                          ].map((day, i) => (
-                            <div
-                              key={i}
-                              className="h-4 flex items-center justify-end"
-                            >
-                              <span className="text-xs text-gray-400">
-                                {i % 2 === 0 ? day : ""}
-                              </span>
-                            </div>
-                          ))}
+                          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
+                            (day, i) => (
+                              <div
+                                key={i}
+                                className="h-4 flex items-center justify-end"
+                              >
+                                <span className="text-xs text-[#575757]">
+                                  {i % 2 === 0 ? day : ""}
+                                </span>
+                              </div>
+                            )
+                          )}
                         </div>
 
-                        {/* Activity Cells */}
                         <div className="col-span-52 grid grid-cols-52 gap-1 px-3 relative">
-                          {/* Light grid lines for better visualization */}
                           <div className="absolute inset-0 grid grid-rows-7 pointer-events-none">
                             {Array.from({ length: 7 }).map((_, i) => (
                               <div
                                 key={i}
-                                className="border-t border-[#334155] opacity-30"
+                                className="border-t border-border opacity-30"
                                 style={{
                                   gridRowStart: i + 1,
                                   marginTop: i === 0 ? "0" : "-1px",
@@ -783,25 +668,22 @@ const ProfilePage = () => {
                           </div>
 
                           {Array.from({ length: 364 }).map((_, i) => {
-                            // Generate random activity level for demo purposes
-                            // In a real app, you would map actual activity data to dates
                             const activityLevel = Math.floor(Math.random() * 5);
                             const color = [
-                              "#1e293b", // No activity - dark background similar to GitHub dark mode
-                              "#0e4429", // Low activity - dark green
-                              "#006d32", // Medium-low activity - medium green
-                              "#26a641", // Medium activity - bright green
-                              "#39d353", // High activity - vibrant green
+                              "var(--color-muted)",
+                              "var(--color-chart-1)",
+                              "var(--color-chart-2)",
+                              "var(--color-chart-3)",
+                              "var(--color-chart-4)",
                             ][activityLevel];
 
-                            // Calculate which week this day belongs to
                             const week = Math.floor(i / 7);
                             const dayOfWeek = i % 7;
 
                             return (
                               <div
                                 key={i}
-                                className="h-4 w-4 rounded-sm cursor-pointer transition-colors duration-200 hover:ring-1 hover:ring-white/50 border border-[#0f172a]/20"
+                                className="h-4 w-4 rounded-sm cursor-pointer transition-colors duration-200 hover:ring-1 hover:ring-primary border border-border"
                                 style={{
                                   backgroundColor: color,
                                   gridColumnStart: week + 1,
@@ -816,8 +698,7 @@ const ProfilePage = () => {
                         </div>
                       </div>
 
-                      {/* Month Labels */}
-                      <div className="absolute top-[-24px] left-8 right-0 flex justify-between text-xs text-gray-400">
+                      <div className="absolute top-[-24px] left-8 right-0 flex justify-between text-xs text-[#575757]">
                         {[
                           "Jan",
                           "Feb",
@@ -837,21 +718,21 @@ const ProfilePage = () => {
                       </div>
                     </div>
 
-                    <div className="mt-6 text-sm text-gray-400 flex justify-between items-center ">
+                    <div className="mt-6 text-sm text-[#575757] flex justify-between items-center ">
                       <p>12,385 total experiments in the last year</p>
                       <div className="flex items-center">
-                        <span className="inline-block w-3 h-3 bg-indigo-400 rounded-full mr-2"></span>
-                        <span className="text-xs text-gray-300 mr-4">
+                        <span className="inline-block w-3 h-3 bg-primary rounded-full mr-2"></span>
+                        <span className="text-xs text-[#575757] mr-4">
                           Experiments
                         </span>
 
-                        <span className="inline-block w-3 h-3 bg-emerald-400 rounded-full mr-2"></span>
-                        <span className="text-xs text-gray-300 mr-4">
+                        <span className="inline-block w-3 h-3 bg-secondary rounded-full mr-2"></span>
+                        <span className="text-xs text-[#575757] mr-4">
                           Simulations
                         </span>
 
-                        <span className="inline-block w-3 h-3 bg-purple-400 rounded-full mr-2"></span>
-                        <span className="text-xs text-gray-300">
+                        <span className="inline-block w-3 h-3 bg-accent rounded-full mr-2"></span>
+                        <span className="text-xs text-[#575757]">
                           Publications
                         </span>
                       </div>
@@ -860,184 +741,40 @@ const ProfilePage = () => {
                 </ResponsiveContainer>
               </CardContent>
             </Card>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="bg-card border-border shadow-lg">
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold mb-4 text-white">
-                    Recent Activities
-                  </h3>
-                  <div className="space-y-4">
-                    {activities.slice(0, 3).map((activity) => (
-                      <div key={activity.id} className="flex items-start gap-3">
-                        <div
-                          className={`w-2 h-2 mt-2 rounded-full ${
-                            activity.type === "experiment"
-                              ? "bg-indigo-400"
-                              : activity.type === "simulation"
-                              ? "bg-emerald-400"
-                              : "bg-purple-400"
-                          }`}
-                        />
-                        <div>
-                          <p className="font-medium text-white">
-                            {activity.name}
-                          </p>
-                          <p className="text-sm text-gray-400">
-                            {activity.type.charAt(0).toUpperCase() +
-                              activity.type.slice(1)}{" "}
-                            • {activity.date}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                    <Button
-                      variant="link"
-                      className="px-0 text-indigo-400 hover:text-indigo-300"
-                    >
-                      View all activities
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-card border-border shadow-lg">
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold mb-6 text-white">
-                    Achievements
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    {[
-                      {
-                        name: "First Experiment",
-                        icon: "🧪",
-                        color: "from-indigo-600/20 to-indigo-900/40",
-                        border: "border-indigo-500/30",
-                        description:
-                          "Completed your first nuclear physics experiment",
-                        date: "April 2023",
-                      },
-                      {
-                        name: "Collaboration Star",
-                        icon: "🌟",
-                        color: "from-amber-600/20 to-amber-900/40",
-                        border: "border-amber-500/30",
-                        description:
-                          "Participated in 10+ collaborative research projects",
-                        date: "January 2025",
-                      },
-                      {
-                        name: "Published Author",
-                        icon: "📝",
-                        color: "from-emerald-600/20 to-emerald-900/40",
-                        border: "border-emerald-500/30",
-                        description:
-                          "First research paper published in a peer-reviewed journal",
-                        date: "March 2025",
-                      },
-                    ].map((achievement, i) => (
-                      <div key={i} className="relative group overflow-hidden">
-                        <div
-                          className={`h-full rounded-lg border ${achievement.border} bg-gradient-to-br ${achievement.color} p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg flex flex-col items-center text-center`}
-                        >
-                          {/* Shine effect on hover */}
-                          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
-                            <div className="absolute inset-0 rotate-12 translate-x-full translate-y-full group-hover:translate-x-0 group-hover:translate-y-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 transition-transform duration-1000"></div>
-                          </div>
-
-                          {/* Achievement icon */}
-                          <div className="relative mb-4">
-                            <div className="absolute -inset-3 rounded-full bg-gradient-to-br from-white/5 to-white/0 blur-md"></div>
-                            <div className="w-20 h-20 rounded-full bg-[#1a2234] flex items-center justify-center relative shadow-inner shadow-black/20 border border-white/10 group-hover:shadow-lg group-hover:border-white/20 transition-all duration-300">
-                              <div className="w-16 h-16 rounded-full bg-[#344054] flex items-center justify-center animate-achievement-pulse">
-                                <span className="text-3xl">
-                                  {achievement.icon}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Achievement info */}
-                          <h4 className="text-lg font-semibold text-white mb-1 group-hover:text-white/90">
-                            {achievement.name}
-                          </h4>
-                          <p className="text-sm text-gray-400 mb-3 line-clamp-2 h-10">
-                            {achievement.description}
-                          </p>
-                          <span className="text-xs text-gray-500 bg-[#101828]/70 px-3 py-1 rounded-full">
-                            {achievement.date}
-                          </span>
-
-                          {/* Bottom glow */}
-                          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2/3 h-1 bg-gradient-to-r from-transparent via-white/20 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* View all achievements button */}
-                  <div className="mt-6 text-center">
-                    <Button
-                      variant="ghost"
-                      className="text-gray-400 hover:text-white hover:bg-[#344054] group transition-all duration-300"
-                    >
-                      <span>View All Achievements</span>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 ml-2 transform group-hover:translate-x-1 transition-transform duration-300"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M14 5l7 7m0 0l-7 7m7-7H3"
-                        />
-                      </svg>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
           </TabsContent>
 
-          {/* Activity Tab */}
           <TabsContent value="activity">
-            <Card className="bg-card border-border shadow-lg">
+            <Card className="bg-card border-border shadow-primary">
               <CardContent className="p-6">
-                <h3 className="text-xl font-semibold mb-4 text-white">
+                <h3 className="text-xl font-semibold mb-4 text-primary">
                   Activity Timeline
                 </h3>
 
                 <div className="relative">
-                  {/* Timeline vertical line */}
-                  <div className="absolute left-[28px] top-2 bottom-2 w-[2px] bg-gradient-to-b from-[#4f46e5]/40 via-[#10b981]/40 to-[#8b5cf6]/40"></div>
+                  <div className="absolute left-[28px] top-2 bottom-2 w-[2px] bg-gradient-to-b from-primary/40 via-secondary/40 to-accent/40"></div>
 
                   <div className="space-y-8">
                     {activities.map((activity, index) => {
-                      // Determine styles based on activity type
                       const bgColor =
                         activity.type === "experiment"
-                          ? "bg-[#2e3b80]/20"
+                          ? "bg-primary/20"
                           : activity.type === "simulation"
-                          ? "bg-[#0d6651]/20"
-                          : "bg-[#5e3c9c]/20";
+                          ? "bg-secondary/20"
+                          : "bg-accent/20";
 
                       const borderColor =
                         activity.type === "experiment"
-                          ? "border-[#4f46e5]/40"
+                          ? "border-primary/40"
                           : activity.type === "simulation"
-                          ? "border-[#10b981]/40"
-                          : "border-[#8b5cf6]/40";
+                          ? "border-secondary/40"
+                          : "border-accent/40";
 
                       const iconBg =
                         activity.type === "experiment"
-                          ? "bg-[#3730a3]"
+                          ? "bg-primary"
                           : activity.type === "simulation"
-                          ? "bg-[#065f46]"
-                          : "bg-[#5b21b6]";
+                          ? "bg-secondary"
+                          : "bg-accent";
 
                       const icon =
                         activity.type === "experiment"
@@ -1056,16 +793,14 @@ const ProfilePage = () => {
                             transform: "translateY(20px)",
                           }}
                         >
-                          {/* Timeline dot */}
                           <div className="relative z-10 mt-1">
                             <div
-                              className={`w-14 h-14 rounded-full flex items-center justify-center ${iconBg} shadow-lg shadow-black/30 border-2 border-[#1a2234] transition-transform duration-300 hover:scale-110`}
+                              className={`w-14 h-14 rounded-full flex items-center justify-center ${iconBg} shadow-lg shadow-black/30 border-2 border-border transition-transform duration-300 hover:scale-110`}
                             >
                               <span className="text-2xl">{icon}</span>
                             </div>
                           </div>
 
-                          {/* Content card */}
                           <div
                             className={`flex-1 p-4 rounded-lg border border-opacity-30 ${borderColor} ${bgColor} shadow-md transition-all duration-300 hover:shadow-lg hover:border-opacity-60 group`}
                             style={{
@@ -1075,22 +810,22 @@ const ProfilePage = () => {
                           >
                             <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-2">
                               <div>
-                                <h4 className="font-semibold text-white text-lg group-hover:text-[#a5b4fc] transition-colors duration-300">
+                                <h4 className="font-semibold text-primary text-lg group-hover:text-primary/90 transition-colors duration-300">
                                   {activity.name}
                                 </h4>
                                 <div className="flex items-center mt-1">
                                   <span
                                     className={`px-2 py-0.5 text-xs rounded-full ${
                                       activity.type === "experiment"
-                                        ? "bg-[#312e81]/40 text-[#a5b4fc]"
+                                        ? "bg-primary/40 text-primary-foreground"
                                         : activity.type === "simulation"
-                                        ? "bg-[#065f46]/40 text-[#6ee7b7]"
-                                        : "bg-[#5b21b6]/40 text-[#c4b5fd]"
+                                        ? "bg-secondary/40 text-secondary-foreground"
+                                        : "bg-accent/40 text-accent-foreground"
                                     } capitalize`}
                                   >
                                     {activity.type}
                                   </span>
-                                  <span className="text-sm text-gray-400 ml-2 flex items-center">
+                                  <span className="text-sm text-[#575757] ml-2 flex items-center">
                                     <svg
                                       xmlns="http://www.w3.org/2000/svg"
                                       className="h-4 w-4 mr-1"
@@ -1114,14 +849,14 @@ const ProfilePage = () => {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="text-gray-300 hover:text-white hover:bg-[#344054]"
+                                  className="text-[#575757] hover:text-primary hover:bg-secondary"
                                 >
                                   View Details
                                 </Button>
                               </div>
                             </div>
 
-                            <div className="mt-3 text-gray-300 text-sm opacity-0 max-h-0 overflow-hidden group-hover:opacity-100 group-hover:max-h-24 transition-all duration-500">
+                            <div className="mt-3 text-sm opacity-0 max-h-0 overflow-hidden group-hover:opacity-100 group-hover:max-h-24 transition-all duration-500">
                               {activity.type === "experiment"
                                 ? "Conducted experimental analysis with state-of-the-art equipment to analyze nuclear reactions."
                                 : activity.type === "simulation"
@@ -1133,7 +868,7 @@ const ProfilePage = () => {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="text-gray-400 hover:text-white hover:bg-[#344054]"
+                                className="text-[#575757] hover:text-primary hover:bg-secondary"
                               >
                                 View Details
                               </Button>
@@ -1148,11 +883,10 @@ const ProfilePage = () => {
             </Card>
           </TabsContent>
 
-          {/* Statistics Tab */}
           <TabsContent value="stats">
-            <Card className="bg-card border-border shadow-lg">
+            <Card className="bg-card border-border shadow-primary">
               <CardContent className="p-6">
-                <h3 className="text-xl font-semibold mb-4 text-white">
+                <h3 className="text-xl font-semibold mb-4 text-primary">
                   Activity Statistics
                 </h3>
                 <ResponsiveContainer width="100%" height={400}>
@@ -1160,32 +894,32 @@ const ProfilePage = () => {
                     data={activityData}
                     margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                   >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                    <XAxis dataKey="date" stroke="#94a3b8" />
-                    <YAxis stroke="#94a3b8" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+                    <XAxis dataKey="date" stroke="var(--color-muted)" />
+                    <YAxis stroke="var(--color-muted)" />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: "#1D2939",
-                        borderColor: "#475569",
-                        color: "#f1f5f9",
+                        backgroundColor: "var(--color-card)",
+                        borderColor: "var(--color-border)",
+                        color: "var(--color-foreground)",
                       }}
                     />
-                    <Legend wrapperStyle={{ color: "#f1f5f9" }} />
+                    <Legend wrapperStyle={{ color: "var(--color-foreground)" }} />
                     <Line
                       type="monotone"
                       dataKey="experiments"
-                      stroke="#a78bfa"
+                      stroke="var(--color-primary)"
                       activeDot={{ r: 8 }}
                     />
                     <Line
                       type="monotone"
                       dataKey="simulations"
-                      stroke="#34d399"
+                      stroke="var(--color-secondary)"
                     />
                     <Line
                       type="monotone"
                       dataKey="publications"
-                      stroke="#f97316"
+                      stroke="var(--color-accent)"
                     />
                   </LineChart>
                 </ResponsiveContainer>

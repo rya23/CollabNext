@@ -88,10 +88,10 @@ const AboutUsSection = () => {
                     transition={{ duration: 0.8, ease: 'easeOut' }}
                     viewport={{ once: true, amount: 0.3 }}
                 >
-                    <video className="w-full rounded-xl shadow-lg border border-border" autoPlay loop muted playsInline>
+                    {/* <video className="w-full rounded-xl shadow-lg border border-border" autoPlay loop muted playsInline>
                         <source src="/Document.webm" type="video/webm" />
                         Your browser does not support the video tag.
-                    </video>
+                    </video> */}
                 </motion.div>
             </div>
 
@@ -151,10 +151,10 @@ const AboutUsSection = () => {
                     transition={{ duration: 0.8, ease: 'easeOut' }}
                     viewport={{ once: true, amount: 0.3 }}
                 >
-                    <video className="w-full rounded-xl shadow-lg border border-border" autoPlay loop muted playsInline>
+                    {/* <video className="w-full rounded-xl shadow-lg border border-border" autoPlay loop muted playsInline>
                         <source src="/Vision.webm" type="video/webm" />
                         Your browser does not support the video tag.
-                    </video>
+                    </video> */}
                 </motion.div>
             </div>
 
