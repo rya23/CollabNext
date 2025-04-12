@@ -119,4 +119,12 @@
     body {
         @apply bg-background text-foreground;
     }
+    
+    /* Control the size of images in the editor */
+    .ProseMirror img {
+        max-width: 300px;
+        height: auto;
+        display: block;
+        margin: 1rem 0;
+    }
 }
