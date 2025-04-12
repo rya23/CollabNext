@@ -1,0 +1,8 @@
+.ghost-suggestion {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    pointer-events: none;
+    user-select: none;
+    white-space: pre;
+}
