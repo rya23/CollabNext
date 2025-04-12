@@ -1,44 +1,43 @@
-import { FloatingToolbar, Toolbar } from "@liveblocks/react-tiptap";
-import { Editor } from "@tiptap/react";
-import { ToolbarMedia } from "./ToolbarMedia";
-import { ToolbarInlineAdvanced } from "./TextInlineAdvanced";
-import { ToolbarAlignment } from "./ToolbarAlignment";
-import { ToolbarBlockSelector } from "./ToolbarBlockSelector";
-import { ToolbarAudio } from "./ToolbarAudio";
+import { FloatingToolbar, Toolbar } from '@liveblocks/react-tiptap';
+import { Editor } from '@tiptap/react';
+import { ToolbarMedia } from './ToolbarMedia';
+import { ToolbarInlineAdvanced } from './TextInlineAdvanced';
+import { ToolbarAlignment } from './ToolbarAlignment';
+import { ToolbarBlockSelector } from './ToolbarBlockSelector';
+import { ToolbarAudio } from './ToolbarAudio';
 
 type Props = {
-  editor: Editor | null;
+    editor: Editor | null;
 };
 
 export function StaticToolbar({ editor }: Props) {
-  return (
-    <Toolbar editor={editor} data-toolbar="static">
-      <Toolbar.SectionHistory />
-      <Toolbar.Separator />
-      <ToolbarBlockSelector editor={editor} />
-      <Toolbar.Separator />
-      <Toolbar.SectionInline />
-      <ToolbarInlineAdvanced editor={editor} />
-      <Toolbar.Separator />
-      <ToolbarAlignment editor={editor} />
-      <Toolbar.Separator />
-      <ToolbarMedia editor={editor} />
-      <Toolbar.Separator />
-      <ToolbarAudio editor={editor} />
-      <Toolbar.Separator />
-      <Toolbar.SectionCollaboration />
-    </Toolbar>
-  );
+    return (
+        <Toolbar editor={editor} data-toolbar="static">
+            <Toolbar.SectionHistory />
+            <Toolbar.Separator />
+            <ToolbarBlockSelector editor={editor} />
+            <Toolbar.Separator />
+            <Toolbar.SectionInline />
+            <ToolbarInlineAdvanced editor={editor} />
+            <Toolbar.Separator />
+            <ToolbarAlignment editor={editor} />
+            <Toolbar.Separator />
+            <ToolbarMedia editor={editor} />
+            <Toolbar.Separator />
+            <Toolbar.Separator />
+            <Toolbar.SectionCollaboration />
+        </Toolbar>
+    );
 }
 
 export function SelectionToolbar({ editor }: Props) {
-  return (
-    <FloatingToolbar editor={editor} data-toolbar="selection">
-      <ToolbarBlockSelector editor={editor} />
-      <Toolbar.Separator />
-      <Toolbar.SectionInline />
-      <Toolbar.Separator />
-      <Toolbar.SectionCollaboration />
-    </FloatingToolbar>
-  );
+    return (
+        <FloatingToolbar editor={editor} data-toolbar="selection">
+            <ToolbarBlockSelector editor={editor} />
+            <Toolbar.Separator />
+            <Toolbar.SectionInline />
+            <Toolbar.Separator />
+            <Toolbar.SectionCollaboration />
+        </FloatingToolbar>
+    );
 }
