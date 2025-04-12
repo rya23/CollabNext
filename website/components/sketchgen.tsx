@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useRef, ChangeEvent, FormEvent } from "react";
+import { useState, useRef, ChangeEvent, FormEvent, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import ImageImprovementPopup from "@/components/ui/ImageImprovementPopup";
 
 export default function SketchGenerator() {
   const [apiKey, setApiKey] = useState("");
@@ -18,8 +19,12 @@ export default function SketchGenerator() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resultImage, setResultImage] = useState<string | null>(null);
+  const [showImprovementPopup, setShowImprovementPopup] = useState(false);
+  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+  const [originalImage, setOriginalImage] = useState<string | null>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const resultImageRef = useRef<HTMLImageElement>(null);
 
   const handleSketchChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -41,6 +46,18 @@ export default function SketchGenerator() {
     }
   };
 
+  // Function to position the popup when the Improve button is clicked
+  const positionAndShowPopup = () => {
+    if (resultImageRef.current) {
+      const rect = resultImageRef.current.getBoundingClientRect();
+      setPopupPosition({
+        x: rect.left + rect.width / 2,
+        y: rect.top
+      });
+      setShowImprovementPopup(true);
+    }
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     
@@ -51,6 +68,7 @@ export default function SketchGenerator() {
     
     setIsLoading(true);
     setError(null);
+    setShowImprovementPopup(false);
     
     // Create form data
     const formData = new FormData();
@@ -92,6 +110,11 @@ export default function SketchGenerator() {
       const imageBlob = await response.blob();
       const imageUrl = URL.createObjectURL(imageBlob);
       
+      // Store the original image if this is the first generation
+      if (!originalImage) {
+        setOriginalImage(imageUrl);
+      }
+      
       // Display the generated image
       setResultImage(imageUrl);
     } catch (error) {
@@ -100,6 +123,16 @@ export default function SketchGenerator() {
     } finally {
       setIsLoading(false);
     }
+  };
+  
+  const handleImprovementSelect = (improvementPrompt: string) => {
+    // Combine the original prompt with the improvement prompt
+    const enhancedPrompt = `${prompt}. ${improvementPrompt}`;
+    setPrompt(enhancedPrompt);
+    setShowImprovementPopup(false);
+    
+    // Auto-submit the form with the new prompt
+    handleSubmit(new Event('submit') as unknown as FormEvent);
   };
 
   return (
@@ -302,12 +335,22 @@ export default function SketchGenerator() {
                 <h3 className="text-lg font-semibold text-white mb-3">Generated Image</h3>
                 <div className="relative aspect-square bg-gray-800/50 rounded-md overflow-hidden">
                   <img
+                    ref={resultImageRef}
                     src={resultImage}
                     alt="Generated Image"
                     className="object-contain w-full h-full"
                   />
                 </div>
-                <div className="mt-3 flex justify-end">
+                <div className="mt-3 flex justify-between">
+                  <Button
+                    onClick={positionAndShowPopup}
+                    variant="outline"
+                    size="sm"
+                    className="text-sm border-purple-600/30 text-purple-400 hover:bg-purple-600/10"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><path d="M12 2v4"/><path d="M12 18v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="m16.24 16.24 2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="m16.24 7.76 2.83-2.83"/></svg>
+                    Improve
+                  </Button>
                   <Button
                     onClick={() => {
                       const link = document.createElement('a');
@@ -316,9 +359,11 @@ export default function SketchGenerator() {
                       link.click();
                     }}
                     variant="outline"
+                    size="sm"
                     className="text-sm border-purple-600/30 text-purple-400 hover:bg-purple-600/10"
                   >
-                    Download Image
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                    Download
                   </Button>
                 </div>
               </motion.div>
@@ -337,6 +382,13 @@ export default function SketchGenerator() {
           </div>
         </motion.div>
       </div>
+      {/* Image Improvement Popup */}
+      <ImageImprovementPopup
+        isVisible={showImprovementPopup}
+        position={popupPosition}
+        onClose={() => setShowImprovementPopup(false)}
+        onSelectOption={handleImprovementSelect}
+      />
     </div>
   );
 }
