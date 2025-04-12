@@ -392,17 +392,16 @@ export default function Dashboard() {
   };
 
   const toggleFavorite = async (id: string) => {
-    console.log("Toggle favorite for project:", id, "Current userId:", userId);
-
-   /*  if (!userId) {
-      console.error("No user ID available for toggling favorites");
+    if (!userId) {
+      console.error("No user ID available");
       toast({
         title: "Authentication required",
-        description: "Please sign in to add favorites",
-        variant: "destructive",
+        description: "Please sign in to manage favorites",
       });
       return;
-    } */
+    }
+
+    console.log("Toggle favorite for project:", id, "Current userId:", userId);
 
     try {
       // Find the project and get its current favorite status
@@ -539,33 +538,33 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="flex flex-col w-full min-h-screen p-6 bg-gray-900">
+    <div className="flex flex-col w-full min-h-screen p-6 bg-background">
       <Toaster />
 
       {/* Dashboard Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold text-foreground">
             {userName ? `${userName}'s Projects` : "My Projects"}
           </h1>
-          <p className="text-gray-400 mt-1">Manage and organize your work</p>
+          <p className="text-muted-foreground mt-1">Manage and organize your work</p>
         </div>
         <div className="flex items-center gap-4 w-full md:w-auto">
           <div className="relative flex-1 md:w-64">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
               placeholder="Search projects..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-gray-800 border-gray-700 text-gray-300 placeholder-gray-500 focus:border-blue-500"
+              className="pl-10"
             />
           </div>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setModalOpen(true)}
-            className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg shadow-lg hover:from-blue-700 hover:to-indigo-700 transition-all whitespace-nowrap"
+            className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg shadow-lg hover:bg-primary/90 transition-all whitespace-nowrap"
           >
             <Plus className="h-5 w-5" />
             New Project
@@ -582,15 +581,15 @@ export default function Dashboard() {
             .map((_, index) => (
               <div
                 key={index}
-                className="rounded-xl bg-gray-800 border border-gray-700 animate-pulse p-6 h-52"
+                className="rounded-xl bg-card border border-border animate-pulse p-6 h-52"
               >
                 <div className="flex justify-between items-start mb-8">
-                  <div className="p-3 rounded-lg bg-gray-700 h-12 w-12"></div>
-                  <div className="h-6 w-6 bg-gray-700 rounded-full"></div>
+                  <div className="p-3 rounded-lg bg-secondary h-12 w-12"></div>
+                  <div className="h-6 w-6 bg-secondary rounded-full"></div>
                 </div>
-                <div className="h-6 w-3/4 bg-gray-700 rounded mb-3"></div>
-                <div className="h-4 w-1/2 bg-gray-700 rounded mb-6"></div>
-                <div className="h-2 w-full bg-gray-700 rounded-full"></div>
+                <div className="h-6 w-3/4 bg-secondary rounded mb-3"></div>
+                <div className="h-4 w-1/2 bg-secondary rounded mb-6"></div>
+                <div className="h-2 w-full bg-secondary rounded-full"></div>
               </div>
             ))
         ) : filteredProjects.length > 0 ? (
@@ -601,18 +600,14 @@ export default function Dashboard() {
               className="relative group cursor-pointer"
               onClick={() => router.push(`/dashboard/project/${project.id}`)}
             >
-              {/* Gradient Background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-xl group-hover:from-blue-500/10 group-hover:to-purple-500/10 transition-all" />
+              {/* Background */}
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 rounded-xl group-hover:from-primary/10 group-hover:to-accent/10 transition-all" />
 
               {/* Content */}
-              <div className="relative p-6 rounded-xl bg-gray-800 border border-gray-700 group-hover:border-gray-600 transition-all">
+              <div className="relative p-6 rounded-xl bg-card border border-border group-hover:border-primary/20 transition-all">
                 <div className="flex justify-between items-start">
-                  <div className="p-3 rounded-lg bg-gray-700 group-hover:bg-gray-600 transition-colors">
-                    <Folder
-                      className={`h-6 w-6 ${
-                        project.isFavorite ? "text-amber-400" : "text-blue-400"
-                      }`}
-                    />
+                  <div className="p-3 rounded-lg bg-secondary group-hover:bg-secondary/80 transition-colors">
+                    <Folder className={`h-6 w-6 ${project.isFavorite ? "text-primary" : "text-accent"}`} />
                   </div>
                   <motion.button
                     whileHover={{ scale: 1.2 }}
@@ -623,18 +618,18 @@ export default function Dashboard() {
                     <Heart
                       className={`h-6 w-6 transition-colors ${
                         project.isFavorite
-                          ? "fill-red-500 text-red-500 drop-shadow-glow"
-                          : "text-gray-500 hover:text-red-400"
+                          ? "fill-destructive text-destructive"
+                          : "text-muted-foreground hover:text-destructive"
                       }`}
                     />
                   </motion.button>
                 </div>
 
-                <h3 className="text-lg font-semibold text-white mt-4 group-hover:text-blue-400 transition-colors">
+                <h3 className="text-lg font-semibold text-foreground mt-4 group-hover:text-primary transition-colors">
                   {project.title}
                 </h3>
 
-                <div className="flex items-center gap-4 mt-2 text-sm text-gray-400">
+                <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Clock className="h-3.5 w-3.5" />
                     {project.lastModified}
@@ -643,13 +638,13 @@ export default function Dashboard() {
                 </div>
 
                 <div className="mt-4">
-                  <div className="flex justify-between text-xs text-gray-500 mb-1">
+                  <div className="flex justify-between text-xs text-muted-foreground mb-1">
                     <span>Progress</span>
                     <span>{project.progress}%</span>
                   </div>
-                  <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"
+                      className="h-full bg-primary rounded-full"
                       style={{ width: `${project.progress}%` }}
                     />
                   </div>
@@ -658,19 +653,19 @@ export default function Dashboard() {
             </motion.div>
           ))
         ) : (
-          <div className="col-span-full p-12 text-center rounded-xl bg-gray-800 border border-gray-700">
-            <Folder className="h-16 w-16 mx-auto mb-6 text-gray-600" />
-            <h2 className="text-2xl font-semibold text-white mb-4">
+          <div className="col-span-full p-12 text-center rounded-xl bg-card border border-border">
+            <Folder className="h-16 w-16 mx-auto mb-6 text-muted-foreground" />
+            <h2 className="text-2xl font-semibold text-foreground mb-4">
               No projects found
             </h2>
-            <p className="text-gray-400 mb-8 max-w-md mx-auto">
+            <p className="text-muted-foreground mb-8 max-w-md mx-auto">
               {searchQuery
                 ? "Try a different search term"
                 : "Create your first project to get started"}
             </p>
             <button
               onClick={() => setModalOpen(true)}
-              className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all"
+              className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all"
             >
               Create a Project
             </button>
@@ -681,20 +676,20 @@ export default function Dashboard() {
       {/* Create Project Modal */}
       <AnimatePresence>
         {isModalOpen && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-background/60 backdrop-blur-sm flex items-center justify-center z-50">
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-gray-800 p-6 rounded-xl shadow-xl max-w-md w-full mx-4 border border-gray-700"
+              className="bg-card p-6 rounded-xl shadow-xl max-w-md w-full mx-4 border border-border"
             >
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-semibold text-white">
+                <h3 className="text-xl font-semibold text-foreground">
                   Create New Project
                 </h3>
                 <button
                   onClick={() => setModalOpen(false)}
-                  className="text-gray-400 hover:text-gray-300 transition-colors"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <Plus className="h-6 w-6 transform rotate-45" />
                 </button>
@@ -704,12 +699,12 @@ export default function Dashboard() {
                 placeholder="Project Title"
                 value={newProjectName}
                 onChange={(e) => setNewProjectName(e.target.value)}
-                className="bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400 mb-6"
+                className="mb-6"
               />
               <div className="flex justify-end gap-3">
                 <button
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
+                  className="px-4 py-2 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors"
                   disabled={isLoading}
                 >
                   Cancel
@@ -717,7 +712,7 @@ export default function Dashboard() {
                 <button
                   onClick={handleCreateProject}
                   disabled={isLoading}
-                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all disabled:opacity-50"
+                  className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all disabled:opacity-50"
                 >
                   {isLoading ? "Creating..." : "Create Project"}
                 </button>

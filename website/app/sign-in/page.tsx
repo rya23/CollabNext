@@ -22,32 +22,32 @@ export default function SignInPage() {
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     // Handle sign in logic here
     console.log({ email, password, rememberMe });
   };
 
   return (
-    <div className="min-h-screen bg-[#030303] flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
         className="w-full max-w-md"
       >
-        <Card className="bg-[#080808] border-purple-900/20 shadow-xl shadow-purple-900/5">
+        <Card className="shadow-lg">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center text-white">
+            <CardTitle className="text-2xl font-bold text-center">
               Sign in to your account
             </CardTitle>
-            <CardDescription className="text-center text-gray-400">
+            <CardDescription className="text-center">
               Enter your credentials to access your account
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-gray-300">
+              <Label htmlFor="email">
                 Email
               </Label>
               <Input
@@ -56,17 +56,17 @@ export default function SignInPage() {
                 placeholder="name@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="bg-[#111111] border-gray-800 text-white focus:ring-purple-600 focus:border-purple-600"
+                className="focus:ring-2 focus:ring-offset-2"
               />
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-gray-300">
+                <Label htmlFor="password">
                   Password
                 </Label>
                 <Link
                   href="/forgot-password"
-                  className="text-sm text-purple-400 hover:text-purple-300"
+                  className="text-sm hover:underline"
                 >
                   Forgot password?
                 </Link>
@@ -77,7 +77,7 @@ export default function SignInPage() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="bg-[#111111] border-gray-800 text-white focus:ring-purple-600 focus:border-purple-600"
+                className="focus:ring-2 focus:ring-offset-2"
               />
             </div>
             <div className="flex items-center space-x-2">
@@ -85,25 +85,24 @@ export default function SignInPage() {
                 id="remember"
                 checked={rememberMe}
                 onCheckedChange={setRememberMe}
-                className="data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
               />
               <label
                 htmlFor="remember"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-300"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 Remember me
               </label>
             </div>
             <Button
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+              className="w-full"
               onClick={handleSubmit}
             >
               Sign in
             </Button>
 
             <div className="relative flex items-center justify-center">
-              <Separator className="absolute w-full bg-gray-800" />
-              <span className="relative px-2 text-xs text-gray-400 bg-[#080808]">
+              <Separator className="absolute w-full" />
+              <span className="relative px-2 text-xs bg-white">
                 OR CONTINUE WITH
               </span>
             </div>
@@ -111,14 +110,14 @@ export default function SignInPage() {
             <div className="grid grid-cols-2 gap-4">
               <Button
                 variant="outline"
-                className="border-gray-800 text-gray-300 hover:bg-gray-800/50"
+                className="hover:bg-gray-50"
               >
                 <Github className="mr-2 h-4 w-4" />
                 GitHub
               </Button>
               <Button
                 variant="outline"
-                className="border-gray-800 text-gray-300 hover:bg-gray-800/50"
+                className="hover:bg-gray-50"
               >
                 <Twitter className="mr-2 h-4 w-4" />
                 Twitter
@@ -126,11 +125,11 @@ export default function SignInPage() {
             </div>
           </CardContent>
           <CardFooter className="justify-center">
-            <p className="text-sm text-gray-400">
+            <p className="text-sm">
               Don&apos;t have an account?{" "}
               <Link
                 href="/sign-up"
-                className="text-purple-400 hover:text-purple-300 font-medium"
+                className="font-medium hover:underline"
               >
                 Sign up
               </Link>

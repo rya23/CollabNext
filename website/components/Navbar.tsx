@@ -26,7 +26,7 @@ const Navbar = () => {
     <motion.nav
       className={`fixed w-full z-50 transition-all duration-300 ${
         isScrolled
-          ? "bg-[#030303]/80 backdrop-blur-lg py-3 shadow-md shadow-purple-900/10"
+          ? "bg-background/80 backdrop-blur-lg py-3 shadow-md"
           : "bg-transparent py-5"
       }`}
       initial={{ opacity: 0, y: -20 }}
@@ -34,27 +34,28 @@ const Navbar = () => {
       transition={{ duration: 0.6 }}
     >
       <div className="container mx-auto px-4 flex justify-between items-center">
-        <Link href="/" className="text-white font-bold text-2xl">
+        <Link href="/" className="text-foreground font-bold text-2xl">
           CollabNext
         </Link>
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-8">
           <NavItem href="/" label="Home" />
-          <NavItem href="#features" label="Features" />
+          <NavItem href="/image-generator" label="Image Generator" />
+          <NavItem href="/comic-generator" label="Comic Generator" />
+          <NavItem href="/sketch-generator" label="Sketch Generator" />
           <NavItem href="#about" label="About" />
-          <NavItem href="#faq" label="FAQ" />
           <div className="flex space-x-3">
             <Link href="/login">
             <Button
               variant="outline"
-              className="border-purple-600 text-purple-400 hover:bg-purple-600/10 hover:text-white"
+              className="border-primary text-primary hover:bg-primary/10"
             >
               Log In
             </Button>
             </Link>
             <Link href="/signup">
-            <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
               Sign Up
             </Button>
             </Link>
@@ -63,7 +64,7 @@ const Navbar = () => {
 
         {/* Mobile Menu Button */}
         <button
-          className="md:hidden text-white"
+          className="md:hidden text-foreground"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -74,7 +75,7 @@ const Navbar = () => {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            className="md:hidden absolute top-full left-0 right-0 bg-[#030303]/95 backdrop-blur-lg"
+            className="md:hidden absolute top-full left-0 right-0 bg-background/95 backdrop-blur-lg"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
@@ -87,8 +88,18 @@ const Navbar = () => {
                 onClick={() => setMobileMenuOpen(false)}
               />
               <MobileNavItem
-                href="#features"
-                label="Features"
+                href="/image-generator"
+                label="Image Generator"
+                onClick={() => setMobileMenuOpen(false)}
+              />
+              <MobileNavItem
+                href="/comic-generator"
+                label="Comic Generator"
+                onClick={() => setMobileMenuOpen(false)}
+              />
+              <MobileNavItem
+                href="/sketch-generator"
+                label="Sketch Generator"
                 onClick={() => setMobileMenuOpen(false)}
               />
               <MobileNavItem
@@ -96,19 +107,14 @@ const Navbar = () => {
                 label="About"
                 onClick={() => setMobileMenuOpen(false)}
               />
-              <MobileNavItem
-                href="#faq"
-                label="FAQ"
-                onClick={() => setMobileMenuOpen(false)}
-              />
               <div className="pt-4 flex flex-col space-y-3">
                 <Button
                   variant="outline"
-                  className="border-purple-600 text-purple-400 hover:bg-purple-600/10 w-full"
+                  className="border-primary text-primary hover:bg-primary/10 w-full"
                 >
                   Log In
                 </Button>
-                <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 w-full">
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 w-full">
                   Sign Up
                 </Button>
               </div>
@@ -124,10 +130,10 @@ const NavItem = ({ href, label }: { href: string; label: string }) => {
   return (
     <Link
       href={href}
-      className="text-gray-300 hover:text-white transition-colors relative group"
+      className="text-muted-foreground hover:text-foreground transition-colors relative group"
     >
       {label}
-      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-purple-500 transition-all duration-300 group-hover:w-full"></span>
+      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
     </Link>
   );
 };
@@ -136,7 +142,7 @@ const MobileNavItem = ({ href, label, onClick }: { href: string; label: string; 
   return (
     <Link
       href={href}
-      className="text-gray-300 hover:text-white py-2 transition-colors block border-b border-gray-800"
+      className="text-muted-foreground hover:text-foreground py-2 transition-colors block border-b border-border"
       onClick={onClick}
     >
       {label}

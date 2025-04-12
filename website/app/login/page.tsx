@@ -61,12 +61,11 @@ export default function LoginPage() {
     }
   };
 
-
   return (
-    <div className="min-h-screen bg-[#030303] flex flex-col justify-center items-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <Link
         href="/"
-        className="absolute top-8 left-8 text-white text-xl font-bold"
+        className="absolute top-8 left-8 text-xl font-bold"
       >
         CollabNext
       </Link>
@@ -77,12 +76,12 @@ export default function LoginPage() {
         transition={{ duration: 0.6 }}
         className="w-full max-w-md"
       >
-        <Card className="bg-[#080808] border-purple-900/20 shadow-xl shadow-purple-900/5">
+        <Card className="shadow-lg">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center text-white">
+            <CardTitle className="text-2xl font-bold text-center">
               Welcome back
             </CardTitle>
-            <CardDescription className="text-center text-gray-400">
+            <CardDescription className="text-center">
               Enter your credentials to access your account
             </CardDescription>
           </CardHeader>
@@ -92,7 +91,7 @@ export default function LoginPage() {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="p-3 rounded-md bg-red-900/20 border border-red-800 text-red-200 text-sm"
+                className="p-3 rounded-md bg-red-100 border border-red-200 text-red-600 text-sm"
               >
                 {error}
               </motion.div>
@@ -100,7 +99,7 @@ export default function LoginPage() {
 
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-gray-300">
+                <Label htmlFor="email">
                   Email
                 </Label>
                 <Input
@@ -109,7 +108,7 @@ export default function LoginPage() {
                   placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-[#111111] border-gray-800 text-white focus:ring-purple-600 focus:border-purple-600"
+                  className="focus:ring-2 focus:ring-offset-2"
                   disabled={isLoading}
                   required
                 />
@@ -117,12 +116,12 @@ export default function LoginPage() {
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-gray-300">
+                  <Label htmlFor="password">
                     Password
                   </Label>
                   <Link
                     href="/forgot-password"
-                    className="text-sm text-purple-400 hover:text-purple-300"
+                    className="text-sm hover:underline"
                   >
                     Forgot password?
                   </Link>
@@ -134,13 +133,13 @@ export default function LoginPage() {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="bg-[#111111] border-gray-800 text-white focus:ring-purple-600 focus:border-purple-600 pr-10"
+                    className="focus:ring-2 focus:ring-offset-2 pr-10"
                     disabled={isLoading}
                     required
                   />
                   <button
                     type="button"
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -155,11 +154,10 @@ export default function LoginPage() {
                   onCheckedChange={(checked) =>
                     setRememberMe(checked as boolean)
                   }
-                  className="data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
                 />
                 <label
                   htmlFor="remember"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-300"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   Remember me
                 </label>
@@ -167,13 +165,13 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                className="w-full"
                 disabled={isLoading}
               >
                 {isLoading ? (
                   <span className="flex items-center">
                     <svg
-                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                      className="animate-spin -ml-1 mr-2 h-4 w-4"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
@@ -204,15 +202,15 @@ export default function LoginPage() {
             </form>
 
             <div className="relative flex items-center justify-center">
-              <Separator className="absolute w-full bg-gray-800" />
-              <span className="relative px-2 text-xs text-gray-400 bg-[#080808]">
+              <Separator className="absolute w-full" />
+              <span className="relative px-2 text-xs bg-white">
                 OR CONTINUE WITH
               </span>
             </div>
 
             <Button
               variant="outline"
-              className="w-full border-gray-800 text-gray-300 hover:bg-gray-800/50 hover:text-white"
+              className="w-full hover:bg-gray-50"
               onClick={() => googleSignIn()}
               disabled={isLoading}
             >
@@ -242,11 +240,11 @@ export default function LoginPage() {
             </Button>
           </CardContent>
           <CardFooter className="justify-center">
-            <p className="text-sm text-gray-400">
+            <p className="text-sm">
               Don&apos;t have an account?{" "}
               <Link
                 href="/signup"
-                className="text-purple-400 hover:text-purple-300 font-medium"
+                className="font-medium hover:underline"
               >
                 Sign up
               </Link>

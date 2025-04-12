@@ -73,6 +73,7 @@ function Loading() {
 
 function Canvas() {
     const layerIds = useStorage((root) => root.layerIds);
+    const svgRef = React.useRef<SVGSVGElement>(null);
 
     const pencilDraft = useSelf((me) => me.presence.pencilDraft);
     const [canvasState, setState] = useState<CanvasState>({
@@ -428,6 +429,29 @@ function Canvas() {
         [camera, canvasState, history, insertLayer, insertPath, setState, unselectLayers]
     );
 
+    const saveCanvas = useCallback(() => {
+        if (!svgRef.current) return;
+        
+        // Create a serialized SVG string
+        const svgData = new XMLSerializer().serializeToString(svgRef.current);
+        const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+        
+        // Create the URL and link
+        const URL = window.URL || window.webkitURL || window;
+        const downloadUrl = URL.createObjectURL(svgBlob);
+        
+        // Create temporary link and trigger download
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = 'whiteboard.svg';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Clean up the URL
+        URL.revokeObjectURL(downloadUrl);
+    }, []);
+
     return (
         <>
             <div className={styles.canvas}>
@@ -437,6 +461,7 @@ function Canvas() {
                     setLastUsedColor={setLastUsedColor}
                 />
                 <svg
+                    ref={svgRef}
                     className={styles.renderer_svg}
                     onWheel={onWheel}
                     onPointerDown={onPointerDown}
@@ -485,6 +510,7 @@ function Canvas() {
                 redo={history.redo}
                 canUndo={canUndo}
                 canRedo={canRedo}
+                onSave={saveCanvas}
             />
         </>
     );
