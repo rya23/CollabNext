@@ -44,7 +44,7 @@ export function SelectionToolbar({ editor }: Props) {
         <FloatingToolbar 
             editor={editor} 
             data-toolbar="selection"
-            className="flex items-center gap-2 p-2 bg-card/95 backdrop-blur border border-border rounded-lg shadow-lg"
+            className="flex items-center gap-2 p-2 bg-card/95 backdrop-blur border border-border  rounded-lg shadow-lg"
         >
             <ToolbarBlockSelector editor={editor} className="min-w-[120px]" />
             <Toolbar.Separator className="w-[1px] h-7 bg-border mx-1" />
