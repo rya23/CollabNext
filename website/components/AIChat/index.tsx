@@ -1,7 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Editor } from "@tiptap/core";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChatBubbleLeftIcon, XMarkIcon, PhotoIcon, ArrowsPointingOutIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
+import {
+  ChatBubbleLeftIcon,
+  XMarkIcon,
+  PhotoIcon,
+  ArrowsPointingOutIcon,
+  PlusCircleIcon,
+} from "@heroicons/react/24/outline";
 import { generateFileContent, FileGenerationResponse } from "@/lib/gemini";
 import { genAI } from "@/lib/geminiInstance";
 import { unified } from "unified";
@@ -17,22 +23,22 @@ interface AIChatProps {
   autoConvertMarkdown?: boolean;
 }
 
-type ChatMode = 'ai-chat' | 'comic-generator';
+type ChatMode = "ai-chat" | "comic-generator";
 
 interface ChatHistory {
-    messages: Array<{
-        role: 'user' | 'assistant';
-        content: string;
-    }>;
+  messages: Array<{
+    role: "user" | "assistant";
+    content: string;
+  }>;
 }
 
 interface Message {
-    role: 'user' | 'assistant';
-    content: string;
-    generatedContent?: FileGenerationResponse;
-    timestamp?: number; // Add timestamp for sorting/reference
-    generatedPrompt?: string;
-    generatedImages?: GeneratedImage[];
+  role: "user" | "assistant";
+  content: string;
+  generatedContent?: FileGenerationResponse;
+  timestamp?: number; // Add timestamp for sorting/reference
+  generatedPrompt?: string;
+  generatedImages?: GeneratedImage[];
 }
 
 interface GeneratedImage {
@@ -46,7 +52,7 @@ const AIChat: React.FC<AIChatProps> = ({
   onClose,
   autoConvertMarkdown = true,
 }) => {
-  const [chatMode, setChatMode] = useState<ChatMode>('ai-chat');
+  const [chatMode, setChatMode] = useState<ChatMode>("ai-chat");
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -59,61 +65,64 @@ const AIChat: React.FC<AIChatProps> = ({
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [generatedPrompt, setGeneratedPrompt] = useState<string | null>(null);
   const [modalImage, setModalImage] = useState<GeneratedImage | null>(null);
-  const [currentMessageImages, setCurrentMessageImages] = useState<GeneratedImage[]>([]);
+  const [currentMessageImages, setCurrentMessageImages] = useState<
+    GeneratedImage[]
+  >([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const chatScrollPositionRef = useRef(0);
 
-    useEffect(() => {
-        if (chatContainerRef.current) {
-            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-        }
-    }, [messages]);
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
 
-    const getChatHistory = (): ChatHistory => {
-        return {
-            messages: messages.map((msg) => ({
-                role: msg.role,
-                content: msg.content,
-            })),
-        };
+  const getChatHistory = (): ChatHistory => {
+    return {
+      messages: messages.map((msg) => ({
+        role: msg.role,
+        content: msg.content,
+      })),
     };
+  };
 
-    const generateResponse = async (userInput: string) => {
-        setIsGenerating(true);
-        try {
-            let response = '';
-            const chatHistory = getChatHistory();
-            const result = await generateFileContent(
-                genAI,
-                userInput,
-                (partialResponse) => {
-                    // Update the UI with streaming response
-                    setMessages((prev) => {
-                        const lastMessage = prev[prev.length - 1];
-                        if (lastMessage?.role === 'assistant') {
-                            return [
-                                ...prev.slice(0, -1),
-                                {
-                                    ...lastMessage,
-                                    content: lastMessage.content + partialResponse,
-                                    timestamp: Date.now(),
-                                },
-                            ];
-                        }
-                        return [
-                            ...prev,
-                            {
-                                role: 'assistant',
-                                content: partialResponse,
-                                timestamp: Date.now(),
-                            },
-                        ];
-                    });
+  const generateResponse = async (userInput: string) => {
+    setIsGenerating(true);
+    try {
+      let response = "";
+      const chatHistory = getChatHistory();
+      const result = await generateFileContent(
+        genAI,
+        userInput,
+        (partialResponse) => {
+          // Update the UI with streaming response
+          setMessages((prev) => {
+            const lastMessage = prev[prev.length - 1];
+            if (lastMessage?.role === "assistant") {
+              return [
+                ...prev.slice(0, -1),
+                {
+                  ...lastMessage,
+                  content: lastMessage.content + partialResponse,
+                  timestamp: Date.now(),
                 },
-                chatHistory
-            );
+              ];
+            }
+            return [
+              ...prev,
+              {
+                role: "assistant",
+                content: partialResponse,
+                timestamp: Date.now(),
+              },
+            ];
+          });
+        },
+        chatHistory
+      );
 
       return {
         content: result.explanation,
@@ -135,25 +144,25 @@ const AIChat: React.FC<AIChatProps> = ({
     if (!input.trim() || isGenerating) return;
 
     const userMessage: Message = {
-      role: 'user',
+      role: "user",
       content: input,
       timestamp: Date.now(),
     };
     setMessages((prev) => [...prev, userMessage]);
-    setInput('');
+    setInput("");
 
-    if (chatMode === 'ai-chat') {
+    if (chatMode === "ai-chat") {
       const aiResponse = await generateResponse(input);
       setMessages((prev) => [
         ...prev,
         {
-          role: 'assistant',
+          role: "assistant",
           content: aiResponse.content,
           generatedContent: aiResponse.generatedContent,
           timestamp: Date.now(),
         },
       ]);
-    } else if (chatMode === 'comic-generator') {
+    } else if (chatMode === "comic-generator") {
       await handleGenerateComicPrompt(input);
     }
   };
@@ -208,37 +217,41 @@ const AIChat: React.FC<AIChatProps> = ({
       editor.chain().focus().insertContent(markdown).run();
     }
   };
-  
+
   const insertImageIntoEditor = (image: GeneratedImage) => {
     if (!editor || !editor.isEditable) return;
-    
+
     try {
       // Create a data URL from the base64 image data
       const imageUrl = `data:${image.mimeType};base64,${image.data}`;
-      
+
       // Insert the image into the editor
       editor.chain().focus().setImage({ src: imageUrl }).run();
     } catch (error) {
       console.error("Error inserting image into editor:", error);
     }
   };
-  
-  const openImageModal = (image: GeneratedImage, allImages: GeneratedImage[], index: number) => {
+
+  const openImageModal = (
+    image: GeneratedImage,
+    allImages: GeneratedImage[],
+    index: number
+  ) => {
     // Save current scroll position before opening modal
     if (chatContainerRef.current) {
       chatScrollPositionRef.current = chatContainerRef.current.scrollTop;
     }
-    
+
     setModalImage(image);
     setCurrentMessageImages(allImages);
     setCurrentImageIndex(index);
     setIsModalOpen(true);
   };
-  
+
   const closeImageModal = () => {
     setIsModalOpen(false);
     setModalImage(null);
-    
+
     // Restore scroll position after closing modal
     setTimeout(() => {
       if (chatContainerRef.current) {
@@ -246,34 +259,36 @@ const AIChat: React.FC<AIChatProps> = ({
       }
     }, 100);
   };
-  
-  const navigateImages = (direction: 'next' | 'prev') => {
+
+  const navigateImages = (direction: "next" | "prev") => {
     if (currentMessageImages.length <= 1) return;
-    
+
     let newIndex;
-    if (direction === 'next') {
+    if (direction === "next") {
       newIndex = (currentImageIndex + 1) % currentMessageImages.length;
     } else {
-      newIndex = (currentImageIndex - 1 + currentMessageImages.length) % currentMessageImages.length;
+      newIndex =
+        (currentImageIndex - 1 + currentMessageImages.length) %
+        currentMessageImages.length;
     }
-    
+
     setCurrentImageIndex(newIndex);
     setModalImage(currentMessageImages[newIndex]);
   };
-  
+
   const downloadImage = (image: GeneratedImage) => {
     try {
       // Create a data URL from the base64 image data
       const imageUrl = `data:${image.mimeType};base64,${image.data}`;
-      
+
       // Get appropriate file extension
       const extension = getFileExtension(image.mimeType);
-      
+
       // Create a temporary link element
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = imageUrl;
       link.download = `comic-panel-${Date.now()}.${extension}`;
-      
+
       // Append to the document, click it, and remove it
       document.body.appendChild(link);
       link.click();
@@ -282,53 +297,98 @@ const AIChat: React.FC<AIChatProps> = ({
       console.error("Error downloading image:", error);
     }
   };
-  
+
   const downloadAllImages = () => {
     if (!currentMessageImages || currentMessageImages.length === 0) return;
-    
+
     // Download each image with a slight delay to prevent browser issues
     currentMessageImages.forEach((image, index) => {
       setTimeout(() => downloadImage(image), index * 300);
     });
   };
-  
+
+  const generatePDF = async (images: GeneratedImage[]) => {
+    if (!images || images.length === 0) return;
+
+    try {
+      // Dynamic import jsPDF to avoid server-side rendering issues
+      const { default: jsPDF } = await import("jspdf");
+
+      const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+      });
+
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+
+      // Add each image to the PDF
+      for (let i = 0; i < images.length; i++) {
+        if (i > 0) {
+          doc.addPage();
+        }
+
+        const image = images[i];
+        const imgData = `data:${image.mimeType};base64,${image.data}`;
+
+        // Add image to the page with proper aspect ratio
+        doc.addImage(
+          imgData,
+          "JPEG",
+          0,
+          0,
+          pageWidth,
+          pageHeight,
+          undefined,
+          "FAST"
+        );
+      }
+
+      // Save the PDF
+      doc.save(`comic-panels-${Date.now()}.pdf`);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+    }
+  };
+
   // Function to get file extension from mime type
   const getFileExtension = (mimeType: string): string => {
     const extensions: Record<string, string> = {
-      'image/jpeg': 'jpg',
-      'image/png': 'png',
-      'image/gif': 'gif',
-      'image/webp': 'webp',
-      'image/svg+xml': 'svg'
+      "image/jpeg": "jpg",
+      "image/png": "png",
+      "image/gif": "gif",
+      "image/webp": "webp",
+      "image/svg+xml": "svg",
     };
-    
-    return extensions[mimeType] || 'png';
+
+    return extensions[mimeType] || "png";
   };
 
   const getComicChatHistory = () => {
     // Filter messages to only include those relevant to comic generation
     // This includes user inputs and assistant responses with generatedPrompt
-    return messages.filter(msg => 
-      chatMode === 'comic-generator' && 
-      (msg.role === 'user' || msg.generatedPrompt)
+    return messages.filter(
+      (msg) =>
+        chatMode === "comic-generator" &&
+        (msg.role === "user" || msg.generatedPrompt)
     );
   };
 
   const handleGenerateComicPrompt = async (storyInput: string) => {
     try {
       setIsGenerating(true);
-      
+
       // Get relevant chat history for context
       const comicHistory = getComicChatHistory();
-      
+
       const response = await fetch("/api/generate-comic-prompt", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           story: storyInput,
-          history: comicHistory 
+          history: comicHistory,
         }),
       });
 
@@ -340,24 +400,24 @@ const AIChat: React.FC<AIChatProps> = ({
       const data = await response.json();
       const prompt = data.prompt || "";
       setGeneratedPrompt(prompt);
-      
+
       // Add assistant message with the generated prompt
       setMessages((prev) => [
         ...prev,
         {
-          role: 'assistant',
+          role: "assistant",
           content: "I've created a comic prompt based on your story:",
           generatedPrompt: prompt,
           timestamp: Date.now(),
         },
       ]);
-      
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "An unknown error occurred";
+      const errorMessage =
+        err instanceof Error ? err.message : "An unknown error occurred";
       setMessages((prev) => [
         ...prev,
         {
-          role: 'assistant',
+          role: "assistant",
           content: `Error: ${errorMessage}`,
           timestamp: Date.now(),
         },
@@ -370,7 +430,7 @@ const AIChat: React.FC<AIChatProps> = ({
   const handleGenerateComicImage = async (prompt: string) => {
     try {
       setIsGeneratingImage(true);
-      
+
       const response = await fetch("/api/generate-image", {
         method: "POST",
         headers: {
@@ -385,24 +445,24 @@ const AIChat: React.FC<AIChatProps> = ({
       }
 
       const data = await response.json();
-      
+
       // Add assistant message with the generated images
       setMessages((prev) => [
         ...prev,
         {
-          role: 'assistant',
+          role: "assistant",
           content: data.text || "Here's your generated comic:",
           generatedImages: data.images || [],
           timestamp: Date.now(),
         },
       ]);
-      
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "An unknown error occurred";
+      const errorMessage =
+        err instanceof Error ? err.message : "An unknown error occurred";
       setMessages((prev) => [
         ...prev,
         {
-          role: 'assistant',
+          role: "assistant",
           content: `Error generating comic: ${errorMessage}`,
           timestamp: Date.now(),
         },
@@ -417,7 +477,7 @@ const AIChat: React.FC<AIChatProps> = ({
       return <p className="text-white">{message.content}</p>;
     }
 
-    if (chatMode === 'ai-chat' && message.generatedContent) {
+    if (chatMode === "ai-chat" && message.generatedContent) {
       return (
         <div>
           <p className="mb-2">{message.generatedContent.explanation}</p>
@@ -432,47 +492,72 @@ const AIChat: React.FC<AIChatProps> = ({
           </button>
         </div>
       );
-    } else if (chatMode === 'comic-generator' && message.generatedPrompt) {
+    } else if (chatMode === "comic-generator" && message.generatedPrompt) {
       return (
         <div>
           <p className="mb-2">{message.content}</p>
           <div className="p-4 bg-gray-100 rounded-md">
-            <pre className="whitespace-pre-wrap text-sm">{message.generatedPrompt}</pre>
+            <pre className="whitespace-pre-wrap text-sm">
+              {message.generatedPrompt}
+            </pre>
           </div>
           <button
             onClick={() => handleGenerateComicImage(message.generatedPrompt!)}
             disabled={isGeneratingImage}
             className="mt-2 text-sm bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 disabled:bg-green-300"
           >
-            {isGeneratingImage ? "Generating Comic..." : "Generate Comic Images"}
+            {isGeneratingImage
+              ? "Generating Comic..."
+              : "Generate Comic Images"}
           </button>
         </div>
       );
-    } else if (chatMode === 'comic-generator' && message.generatedImages && message.generatedImages.length > 0) {
+    } else if (
+      chatMode === "comic-generator" &&
+      message.generatedImages &&
+      message.generatedImages.length > 0
+    ) {
       return (
         <div>
           <p className="mb-2">{message.content}</p>
-          <div className={`grid ${message.generatedImages.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} gap-4 mt-2`}>
+          <div
+            className={`grid ${
+              message.generatedImages.length > 1 ? "grid-cols-2" : "grid-cols-1"
+            } gap-4 mt-2`}
+          >
             {message.generatedImages.map((image, index) => (
-              <div key={index} className="border rounded-lg overflow-hidden shadow-md">
+              <div
+                key={index}
+                className="border rounded-lg overflow-hidden shadow-md"
+              >
                 <div className="relative aspect-square group cursor-pointer">
                   <img
                     src={`data:${image.mimeType};base64,${image.data}`}
                     alt={`Comic panel ${index + 1}`}
                     className="object-contain w-full h-full"
-                    onClick={() => openImageModal(image, message.generatedImages || [], index)}
+                    onClick={() =>
+                      openImageModal(
+                        image,
+                        message.generatedImages || [],
+                        index
+                      )
+                    }
                   />
                   <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-                    <button 
+                    <button
                       className="p-2 bg-white rounded-full shadow-md mr-2"
                       onClick={(e) => {
                         e.stopPropagation();
-                        openImageModal(image, message.generatedImages || [], index);
+                        openImageModal(
+                          image,
+                          message.generatedImages || [],
+                          index
+                        );
                       }}
                     >
                       <ArrowsPointingOutIcon className="w-5 h-5 text-gray-700" />
                     </button>
-                    <button 
+                    <button
                       className="p-2 bg-white rounded-full shadow-md"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -504,20 +589,21 @@ const AIChat: React.FC<AIChatProps> = ({
   const switchMode = (mode: ChatMode) => {
     if (mode !== chatMode) {
       setChatMode(mode);
-      
+
       // Only reset messages if switching TO comic-generator mode for the first time
       // or if switching back to AI chat mode
-      if (mode === 'ai-chat' || !messages.some(msg => msg.generatedPrompt)) {
+      if (mode === "ai-chat" || !messages.some((msg) => msg.generatedPrompt)) {
         setMessages([
           {
             role: "assistant",
-            content: mode === 'ai-chat' 
-              ? "Hi! I can help you generate code or content. What would you like to create?" 
-              : "Hi! I can create comic strips based on your story ideas. What story would you like to turn into a comic? You can also suggest changes to previously generated comics.",
+            content:
+              mode === "ai-chat"
+                ? "Hi! I can help you generate code or content. What would you like to create?"
+                : "Hi! I can create comic strips based on your story ideas. What story would you like to turn into a comic? You can also suggest changes to previously generated comics.",
           },
         ]);
       }
-      
+
       setInput("");
       setGeneratedPrompt(null);
     }
@@ -533,7 +619,7 @@ const AIChat: React.FC<AIChatProps> = ({
           className="fixed inset-0 backdrop-blur-sm bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
           onClick={closeImageModal}
         >
-          <motion.div 
+          <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
@@ -550,13 +636,22 @@ const AIChat: React.FC<AIChatProps> = ({
                 )}
               </div>
               <div className="flex items-center space-x-2">
-                <button 
+                <button
                   onClick={downloadAllImages}
                   className="text-xs bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
                 >
                   Download All
                 </button>
-                <button onClick={closeImageModal} className="p-1 hover:bg-gray-100 rounded">
+                <button
+                  onClick={() => generatePDF(currentMessageImages)}
+                  className="text-xs bg-purple-500 text-white px-3 py-1 rounded hover:bg-purple-600"
+                >
+                  Download as PDF
+                </button>
+                <button
+                  onClick={closeImageModal}
+                  className="p-1 hover:bg-gray-100 rounded"
+                >
                   <XMarkIcon className="w-5 h-5" />
                 </button>
               </div>
@@ -567,23 +662,45 @@ const AIChat: React.FC<AIChatProps> = ({
                 alt="Comic panel expanded view"
                 className="max-h-[70vh] object-contain"
               />
-              
+
               {currentMessageImages.length > 1 && (
                 <>
-                  <button 
-                    onClick={() => navigateImages('prev')}
+                  <button
+                    onClick={() => navigateImages("prev")}
                     className="absolute left-2 top-1/2 transform -translate-y-1/2 p-2 bg-white bg-opacity-70 rounded-full shadow-md hover:bg-opacity-100 transition-all"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 19l-7-7 7-7"
+                      />
                     </svg>
                   </button>
-                  <button 
-                    onClick={() => navigateImages('next')}
+                  <button
+                    onClick={() => navigateImages("next")}
                     className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 bg-white bg-opacity-70 rounded-full shadow-md hover:bg-opacity-100 transition-all"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
                     </svg>
                   </button>
                 </>
@@ -609,7 +726,7 @@ const AIChat: React.FC<AIChatProps> = ({
           </motion.div>
         </motion.div>
       )}
-      
+
       {isOpen && (
         <motion.div
           initial={{ x: 300, opacity: 0 }}
@@ -620,7 +737,9 @@ const AIChat: React.FC<AIChatProps> = ({
           <div className="flex flex-col h-full">
             <div className="p-4 border-b flex justify-between items-center">
               <h2 className="text-lg font-semibold">
-                {chatMode === 'ai-chat' ? 'Content Generator' : 'Comic Generator'}
+                {chatMode === "ai-chat"
+                  ? "Content Generator"
+                  : "Comic Generator"}
               </h2>
               <button
                 onClick={onClose}
@@ -629,17 +748,25 @@ const AIChat: React.FC<AIChatProps> = ({
                 <XMarkIcon className="w-5 h-5" />
               </button>
             </div>
-            
+
             <div className="flex border-b">
               <button
-                onClick={() => switchMode('ai-chat')}
-                className={`flex-1 py-2 px-4 text-center ${chatMode === 'ai-chat' ? 'bg-blue-100 text-blue-700 font-medium' : 'hover:bg-gray-100'}`}
+                onClick={() => switchMode("ai-chat")}
+                className={`flex-1 py-2 px-4 text-center ${
+                  chatMode === "ai-chat"
+                    ? "bg-blue-100 text-blue-700 font-medium"
+                    : "hover:bg-gray-100"
+                }`}
               >
                 AI Chat
               </button>
               <button
-                onClick={() => switchMode('comic-generator')}
-                className={`flex-1 py-2 px-4 text-center ${chatMode === 'comic-generator' ? 'bg-blue-100 text-blue-700 font-medium' : 'hover:bg-gray-100'}`}
+                onClick={() => switchMode("comic-generator")}
+                className={`flex-1 py-2 px-4 text-center ${
+                  chatMode === "comic-generator"
+                    ? "bg-blue-100 text-blue-700 font-medium"
+                    : "hover:bg-gray-100"
+                }`}
               >
                 Comic Generator
               </button>
@@ -682,9 +809,11 @@ const AIChat: React.FC<AIChatProps> = ({
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder={chatMode === 'ai-chat' 
-                    ? "Describe the content you need..." 
-                    : "Enter your story idea for a comic..."}
+                  placeholder={
+                    chatMode === "ai-chat"
+                      ? "Describe the content you need..."
+                      : "Enter your story idea for a comic..."
+                  }
                   className="flex-1 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   disabled={isGenerating || isGeneratingImage}
                 />
@@ -693,7 +822,7 @@ const AIChat: React.FC<AIChatProps> = ({
                   disabled={isGenerating || isGeneratingImage}
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300"
                 >
-                  {chatMode === 'ai-chat' ? 'Generate' : 'Create Comic'}
+                  {chatMode === "ai-chat" ? "Generate" : "Create Comic"}
                 </button>
               </div>
             </form>
