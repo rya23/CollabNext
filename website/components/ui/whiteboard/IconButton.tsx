@@ -5,6 +5,7 @@ type Props = {
   children: React.ReactNode;
   isActive?: boolean;
   disabled?: boolean;
+  title?: string;
 };
 
 export default function IconButton({
@@ -12,12 +13,14 @@ export default function IconButton({
   children,
   isActive,
   disabled,
+  title,
 }: Props) {
   return (
     <button
       className={`${styles.button} ${isActive ? styles.button_active : ""}`}
       onClick={onClick}
       disabled={disabled}
+      title={title}
     >
       {children}
     </button>

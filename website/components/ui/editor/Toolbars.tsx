@@ -12,15 +12,15 @@ type Props = {
 
 export function StaticToolbar({ editor }: Props) {
     return (
-        <Toolbar 
-            editor={editor} 
+        <Toolbar
+            editor={editor}
             data-toolbar="static"
             className="flex items-center gap-2 p-2 bg-card rounded-lg border border-border shadow-sm"
         >
             <div className="flex items-center gap-2">
                 <Toolbar.SectionHistory className="flex items-center gap-1" />
                 <Toolbar.Separator className="w-[1px] h-7 bg-border mx-1" />
-                
+
                 <div className="flex items-center gap-2">
                     <ToolbarBlockSelector editor={editor} className="min-w-[120px]" />
                     <Toolbar.Separator className="w-[1px] h-7 bg-border mx-1" />
@@ -31,9 +31,9 @@ export function StaticToolbar({ editor }: Props) {
                     <Toolbar.Separator className="w-[1px] h-7 bg-border mx-1" />
                     <ToolbarMedia editor={editor} />
                 </div>
-                
+
                 <Toolbar.Separator className="w-[1px] h-7 bg-border mx-1" />
-                <Toolbar.SectionCollaboration className="flex items-center gap-1" />
+                <Toolbar.SectionCollaboration />
             </div>
         </Toolbar>
     );
@@ -41,8 +41,8 @@ export function StaticToolbar({ editor }: Props) {
 
 export function SelectionToolbar({ editor }: Props) {
     return (
-        <FloatingToolbar 
-            editor={editor} 
+        <FloatingToolbar
+            editor={editor}
             data-toolbar="selection"
             className="flex items-center gap-2 p-2 bg-card/95 backdrop-blur border border-border  rounded-lg shadow-lg"
         >

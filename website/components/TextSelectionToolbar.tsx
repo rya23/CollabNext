@@ -15,6 +15,7 @@ import {
     ElaborateResponse,
     StyleTransformResponse,
 } from '../lib/gemini';
+import { PhotoIcon } from '@heroicons/react/24/outline';
 
 type ToolbarPosition = {
     top: number;
@@ -22,7 +23,7 @@ type ToolbarPosition = {
     visible: boolean;
 };
 
-type ActionType = 'summarize' | 'grammar' | 'translate' | 'elaborate' | 'style';
+type ActionType = 'summarize' | 'grammar' | 'translate' | 'elaborate' | 'style' | 'image';
 
 type ResultType =
     | SummarizeResponse
@@ -30,7 +31,19 @@ type ResultType =
     | TranslateResponse
     | ElaborateResponse
     | StyleTransformResponse
+    | GeneratedImageResponse
     | null;
+
+interface GeneratedImage {
+    data: string;
+    mimeType: string;
+}
+
+interface GeneratedImageResponse {
+    images: GeneratedImage[];
+    text: string;
+    generatedPrompt?: string;
+}
 
 interface TextSelectionToolbarProps {
     editor: Editor;
@@ -51,6 +64,9 @@ const TextSelectionToolbar: React.FC<TextSelectionToolbarProps> = ({ editor }) =
     const [editableText, setEditableText] = useState<string>('');
     const [styleOption, setStyleOption] = useState<string>('Professional');
     const [showStyleOptions, setShowStyleOptions] = useState<boolean>(false);
+    const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
+    const [isGeneratingImage, setIsGeneratingImage] = useState<boolean>(false);
+    const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
 
     const toolbarRef = useRef<HTMLDivElement>(null);
     const resultRef = useRef<HTMLDivElement>(null);
@@ -123,6 +139,7 @@ const TextSelectionToolbar: React.FC<TextSelectionToolbarProps> = ({ editor }) =
                 setShowTranslateOptions(false);
                 setShowStyleOptions(false);
                 setEditableText('');
+                setGeneratedImages([]);
             }
         };
 
@@ -178,6 +195,58 @@ const TextSelectionToolbar: React.FC<TextSelectionToolbarProps> = ({ editor }) =
                     actionResult = await transformTextStyle(genAI, selectedText, styleOption);
                     setEditableText((actionResult as StyleTransformResponse).transformed);
                     break;
+                case 'image':
+                    setIsGeneratingImage(true);
+                    try {
+                        // First generate a comic prompt from the selected text
+                        const promptResponse = await fetch('/api/generate-comic-prompt', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                story: selectedText,
+                                history: [],
+                            }),
+                        });
+
+                        if (!promptResponse.ok) {
+                            const errorData = await promptResponse.json();
+                            throw new Error(errorData.error || 'Failed to generate comic prompt');
+                        }
+
+                        const promptData = await promptResponse.json();
+                        const comicPrompt = promptData.prompt || selectedText;
+                        setGeneratedPrompt(comicPrompt);
+
+                        // Then use the generated prompt to create the image
+                        const imageResponse = await fetch('/api/generate-image', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ prompt: comicPrompt }),
+                        });
+
+                        if (!imageResponse.ok) {
+                            const errorData = await imageResponse.json();
+                            throw new Error(errorData.error || 'Failed to generate image');
+                        }
+
+                        const imageData = await imageResponse.json();
+                        setGeneratedImages(imageData.images || []);
+                        actionResult = {
+                            images: imageData.images || [],
+                            text: imageData.text || 'Generated image based on your text',
+                            generatedPrompt: comicPrompt,
+                        } as GeneratedImageResponse;
+                    } catch (error) {
+                        console.error('Error generating image:', error);
+                        setResult({ error: 'Failed to generate image' } as any);
+                    } finally {
+                        setIsGeneratingImage(false);
+                    }
+                    break;
             }
 
             setResult(actionResult);
@@ -192,7 +261,14 @@ const TextSelectionToolbar: React.FC<TextSelectionToolbarProps> = ({ editor }) =
 
     // Replace original text with the AI-generated and possibly user-edited text
     const replaceOriginalText = () => {
-        if (!editor || !editableText) return;
+        if (!editor) return;
+
+        if (currentAction === 'image' && generatedImages.length > 0) {
+            insertImageIntoEditor(generatedImages[0]);
+            return;
+        }
+
+        if (!editableText) return;
 
         try {
             // Delete the selected content and insert the new text
@@ -203,6 +279,7 @@ const TextSelectionToolbar: React.FC<TextSelectionToolbarProps> = ({ editor }) =
             setResult(null);
             setCurrentAction(null);
             setEditableText('');
+            setGeneratedImages([]);
 
             // Focus back on the editor
             editor.commands.focus();
@@ -212,8 +289,84 @@ const TextSelectionToolbar: React.FC<TextSelectionToolbarProps> = ({ editor }) =
         }
     };
 
+    // Insert image into editor
+    const insertImageIntoEditor = (image: GeneratedImage) => {
+        if (!editor || !editor.isEditable) return;
+
+        try {
+            // Create a data URL from the base64 image data
+            const imageUrl = `data:${image.mimeType};base64,${image.data}`;
+
+            // Store the current selection position
+            const { from, to } = editor.state.selection;
+
+            // Insert the image after the current selection without deleting the selection
+            // First move to the end of the selection
+            editor.chain().focus().setTextSelection(to).run();
+
+            // Then insert the image at that position
+            // We'll use a simple image insertion and rely on CSS to control the size
+            editor.chain().setImage({ src: imageUrl }).run();
+
+            // Note: Image resizing is handled via CSS in the editor's stylesheet
+            // The editor should have a rule like: .ProseMirror img { max-width: 300px; height: auto; }
+
+            // Close the toolbar and reset state
+            setPosition({ ...position, visible: false });
+            setResult(null);
+            setCurrentAction(null);
+            setEditableText('');
+            setGeneratedImages([]);
+
+            // Focus back on the editor
+            editor.commands.focus();
+        } catch (error) {
+            console.error('Error inserting image into editor:', error);
+            alert('Failed to insert image. Please try again.');
+        }
+    };
+
     const renderResult = () => {
         if (!result) return null;
+
+        if (currentAction === 'image' && (result as GeneratedImageResponse)?.images?.length > 0) {
+            const images = (result as GeneratedImageResponse).images;
+            const prompt = (result as GeneratedImageResponse).generatedPrompt;
+            return (
+                <div className="mb-4 w-full">
+                    <h3 className="text-lg font-semibold mb-2">Generated Image</h3>
+                    {prompt && (
+                        <div className="mb-3 p-2 bg-gray-50 dark:bg-gray-800 rounded-md text-sm">
+                            <p className="font-medium mb-1">Generated from prompt:</p>
+                            <p className="text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{prompt}</p>
+                        </div>
+                    )}
+                    <div className={`grid ${images.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} gap-4 mt-2`}>
+                        {images.map((image, index) => (
+                            <div key={index} className="border rounded-lg overflow-hidden shadow-md">
+                                <div className="relative aspect-square">
+                                    <img
+                                        src={`data:${image.mimeType};base64,${image.data}`}
+                                        alt={`Generated image ${index + 1}`}
+                                        className="object-contain w-full h-full"
+                                        width="150"
+                                        height="150"
+                                    />
+                                </div>
+                                <div className="p-2 bg-gray-50 flex justify-center">
+                                    <button
+                                        onClick={() => insertImageIntoEditor(image)}
+                                        className="text-xs bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                                    >
+                                        Insert this image
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
 
         return (
             <div className="mb-4 w-full">
@@ -310,6 +463,14 @@ const TextSelectionToolbar: React.FC<TextSelectionToolbarProps> = ({ editor }) =
                 >
                     Style
                 </button>
+                <button
+                    onClick={() => handleAction('image')}
+                    disabled={isProcessing || isGeneratingImage}
+                    className="px-3 py-1 bg-white hover:bg-black text-black hover:text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1"
+                >
+                    <PhotoIcon className="w-4 h-4" />
+                    Image
+                </button>
 
                 {showTranslateOptions && (
                     <div className="absolute top-full left-0 mt-2 p-2 bg-white dark:bg-gray-800 shadow-lg rounded-md border border-gray-200 dark:border-gray-700">
@@ -369,10 +530,13 @@ const TextSelectionToolbar: React.FC<TextSelectionToolbarProps> = ({ editor }) =
                     ref={resultRef}
                     className="fixed z-50 bg-white dark:bg-gray-800 shadow-lg rounded-md p-4 max-w-md w-full border border-gray-200 dark:border-gray-700"
                     style={{
-                        top: `${position.top + 50}px`,
-                        left: `${position.left}px`,
-                        transform: 'translateX(-50%)',
+                        // Position the panel in the center of the screen instead of relative to selection
+                        // This prevents overflow issues
+                        top: '60%',
+                        left: '85%',
+                        transform: 'translate(-50%, -50%)',
                         maxHeight: '80vh',
+                        // maxWidth: '90vw',
                         overflow: 'auto',
                     }}
                 >

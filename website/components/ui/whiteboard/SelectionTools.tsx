@@ -1,11 +1,12 @@
-import { memo } from 'react';
+import { memo, useState, useEffect } from 'react';
 import ColorPicker from './ColorPicker';
 import IconButton from './IconButton';
 import { Camera, Color } from './types';
 import styles from './SelectionTools.module.css';
 import useDeleteLayers from './hooks/useDeleteLayers';
 import useSelectionBounds from './hooks/useSelectionBounds';
-import { useSelf, useMutation } from '@liveblocks/react/suspense';
+import { useSelf, useMutation, useStorage } from '@liveblocks/react/suspense';
+import AIImageEnhancer from './AIImageEnhancer';
 
 type SelectionToolsProps = {
     isAnimated: boolean;
@@ -15,7 +16,18 @@ type SelectionToolsProps = {
 
 function SelectionTools({ isAnimated, camera, setLastUsedColor }: SelectionToolsProps) {
     const selection = useSelf((me) => me.presence.selection);
-
+    const [showImageEnhancer, setShowImageEnhancer] = useState(false);
+    const [selectedImageData, setSelectedImageData] = useState<string | null>(null);
+    
+    // Toggle image enhancer
+    const toggleImageEnhancer = () => {
+        // For now, we'll just use a placeholder image for the demo
+        // In a real implementation, we would capture the selected element as an image
+        const placeholderImage = "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20version%3D%221.1%22%20baseProfile%3D%22full%22%20width%3D%22300%22%20height%3D%22200%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22grey%22%2F%3E%3Ctext%20x%3D%22150%22%20y%3D%22100%22%20font-size%3D%2220%22%20alignment-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20fill%3D%22white%22%3ESelected%20Element%3C%2Ftext%3E%3C%2Fsvg%3E";
+        setSelectedImageData(placeholderImage);
+        setShowImageEnhancer(true);
+    };
+    
     /**
      * Move all the selected layers to the front
      */
@@ -85,6 +97,18 @@ function SelectionTools({ isAnimated, camera, setLastUsedColor }: SelectionTools
 
     const x = selectionBounds.width / 2 + selectionBounds.x + camera.x;
     const y = selectionBounds.y + camera.y;
+    // If the image enhancer is shown, render it instead of the regular selection tools
+    if (showImageEnhancer && selectedImageData) {
+        return (
+            <AIImageEnhancer 
+                isAnimated={isAnimated} 
+                camera={camera} 
+                onClose={() => setShowImageEnhancer(false)}
+                imageData={selectedImageData}
+            />
+        );
+    }
+    
     return (
         <div
             className={styles.selection_inspector}
@@ -113,6 +137,20 @@ function SelectionTools({ isAnimated, camera, setLastUsedColor }: SelectionTools
                             d="M11.1758 4.23547L4.024 6.27885C3.29872 6.48607 3.29872 7.51391 4.024 7.72114L11.1758 9.76452C11.7145 9.91842 12.2855 9.91842 12.8242 9.76452L19.976 7.72114C20.7013 7.51391 20.7013 6.48607 19.976 6.27885L12.8242 4.23547C12.2855 4.08156 11.7145 4.08156 11.1758 4.23547ZM4.02345 10.7788L6.7493 10L11.9992 11.5L17.2493 9.99992L19.9755 10.7788C20.7007 10.986 20.7007 12.0139 19.9755 12.2211L12.8236 14.2645C12.7991 14.2715 12.7746 14.2782 12.75 14.2845V17.5H15L12 22L9 17.5H11.25V14.2848C11.225 14.2783 11.2001 14.2716 11.1753 14.2645L4.02345 12.2211C3.29817 12.0139 3.29817 10.986 4.02345 10.7788Z"
                             fill="currentColor"
                         />
+                    </svg>
+                </IconButton>
+                
+                {/* AI enhance button - always visible */}
+                <IconButton onClick={toggleImageEnhancer} title="AI Enhance">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 2v4"/>
+                        <path d="M12 18v4"/>
+                        <path d="m4.93 4.93 2.83 2.83"/>
+                        <path d="m16.24 16.24 2.83 2.83"/>
+                        <path d="M2 12h4"/>
+                        <path d="M18 12h4"/>
+                        <path d="m4.93 19.07 2.83-2.83"/>
+                        <path d="m16.24 7.76 2.83-2.83"/>
                     </svg>
                 </IconButton>
             </div>
