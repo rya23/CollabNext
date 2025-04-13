@@ -59,6 +59,7 @@
     "firebase": "^11.6.0",
     "framer-motion": "^12.4.10",
     "jspdf": "^3.0.1",
+    "lottie-react": "^2.4.1",
     "lucide-react": "^0.487.0",
     "mime-types": "^3.0.1",
     "motion": "^12.4.10",

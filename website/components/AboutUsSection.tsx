@@ -1,6 +1,9 @@
 'use client';
 import Drawer from './Drawer';
 import { motion } from 'framer-motion';
+import Lottie from 'lottie-react';
+import animationData from '../public/animation.json'; // Update this path to where your JSON file is located
+import vision from '../public/animation1.json'; // Update this path to where your JSON file is located
 import { useEffect, useRef, useState } from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
@@ -88,10 +91,11 @@ const AboutUsSection = () => {
                     transition={{ duration: 0.8, ease: 'easeOut' }}
                     viewport={{ once: true, amount: 0.3 }}
                 >
-                    {/* <video className="w-full rounded-xl shadow-lg border border-border" autoPlay loop muted playsInline>
-                        <source src="/Document.webm" type="video/webm" />
-                        Your browser does not support the video tag.
-                    </video> */}
+                    <Lottie
+                           animationData={animationData}
+                            className="w-full"
+                               loop={true}
+                                   />
                 </motion.div>
             </div>
 
@@ -145,17 +149,18 @@ const AboutUsSection = () => {
 
                 {/* Add Vision.webm video */}
                 <motion.div
-                    className="w-full md:w-1/2 max-w-[600px] p-4 flex justify-center"
-                    initial={{ opacity: 0, x: -50 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.8, ease: 'easeOut' }}
-                    viewport={{ once: true, amount: 0.3 }}
-                >
-                    {/* <video className="w-full rounded-xl shadow-lg border border-border" autoPlay loop muted playsInline>
-                        <source src="/Vision.webm" type="video/webm" />
-                        Your browser does not support the video tag.
-                    </video> */}
-                </motion.div>
+    className="w-full md:w-1/2 max-w-[600px] p-4 flex justify-center"
+    initial={{ opacity: 0, x: -50 }}
+    whileInView={{ opacity: 1, x: 0 }}
+    transition={{ duration: 0.8, ease: 'easeOut' }}
+    viewport={{ once: true, amount: 0.3 }}
+>
+    <Lottie
+        animationData={vision} // Changed from vision={vision} to animationData={vision}
+        className="w-full"
+        loop={true}
+    />
+</motion.div>
             </div>
 
             <div className="py-12 sm:py-24 px-4 sm:px-5">
