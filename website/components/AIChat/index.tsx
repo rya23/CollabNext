@@ -55,7 +55,7 @@ const AIChat: React.FC<AIChatProps> = ({ editor, isOpen, onClose, autoConvertMar
     const [isGeneratingImage, setIsGeneratingImage] = useState(false);
     const [generatedPrompt, setGeneratedPrompt] = useState<string | null>(null);
     const [modalImage, setModalImage] = useState<GeneratedImage | null>(null);
-
+    const [showPromptSuggestions, setShowPromptSuggestions] = useState(false);
     const [currentMessageImages, setCurrentMessageImages] = useState<GeneratedImage[]>([]);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -529,6 +529,40 @@ const AIChat: React.FC<AIChatProps> = ({ editor, isOpen, onClose, autoConvertMar
         }
     };
 
+    const generatePDF = async (images: GeneratedImage[]) => {
+        if (!images || images.length === 0) return;
+
+        try {
+            // Dynamic import jsPDF to avoid server-side rendering issues
+            const { default: jsPDF } = await import('jspdf');
+
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+            });
+
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+
+            // Add each image to the PDF
+            for (let i = 0; i < images.length; i++) {
+                if (i > 0) {
+                    doc.addPage();
+                }
+
+                const image = images[i];
+                const imgData = `data:${image.mimeType};base64,${image.data}`;
+
+                // Add image to the page with proper aspect ratio
+                doc.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
+            }
+
+            // Save the PDF
+            doc.save(`comic-panels-${Date.now()}.pdf`);
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+        }
+    };
     // Add this download function to your component
     const downloadSlideshow = async (slideshowId: string) => {
         if (!slideshowId) return;
