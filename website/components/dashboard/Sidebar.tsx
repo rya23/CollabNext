@@ -51,7 +51,12 @@ const menuItems = [
         title: 'Community',
         icon: Users,
         path: '/dashboard/community',
-    }
+    },
+    {
+        title: 'Kanban',
+        icon: FolderKanban,
+        path: '/dashboard/kanban',
+    },
 ];
 
 export default function Sidebar({ session }: { session: any }) {

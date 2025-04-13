@@ -1,22 +1,16 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Editor } from "@tiptap/core";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  ChatBubbleLeftIcon,
-  XMarkIcon,
-  PhotoIcon,
-  ArrowsPointingOutIcon,
-  PlusCircleIcon,
-} from "@heroicons/react/24/outline";
-import { generateFileContent, FileGenerationResponse } from "@/lib/gemini";
-import { genAI } from "@/lib/geminiInstance";
-import { unified } from "unified";
-import remarkParse from "remark-parse";
-import remarkRehype from "remark-rehype";
-import rehypeStringify from "rehype-stringify";
-import remarkGfm from "remark-gfm";
-import { Link, Share } from "lucide-react";
-import { toast } from "react-hot-toast";
+import React, { useState, useRef, useEffect } from 'react';
+import { Editor } from '@tiptap/core';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChatBubbleLeftIcon, XMarkIcon, PhotoIcon, ArrowsPointingOutIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
+import { generateFileContent, FileGenerationResponse } from '@/lib/gemini';
+import { genAI } from '@/lib/geminiInstance';
+import { unified } from 'unified';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
+import rehypeStringify from 'rehype-stringify';
+import remarkGfm from 'remark-gfm';
+import { Link, Share } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 interface AIChatProps {
   editor: Editor;
@@ -48,128 +42,136 @@ interface GeneratedImage {
   mimeType: string;
 }
 
-const AIChat: React.FC<AIChatProps> = ({
-  editor,
-  isOpen,
-  onClose,
-  autoConvertMarkdown = true,
-}) => {
-  const [chatMode, setChatMode] = useState<ChatMode>("ai-chat");
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content:
-        "Hi! I can help you generate code or content. What would you like to create?",
-    },
-  ]);
-  const [input, setInput] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
-  const [generatedPrompt, setGeneratedPrompt] = useState<string | null>(null);
-  const [modalImage, setModalImage] = useState<GeneratedImage | null>(null);
-  const [currentMessageImages, setCurrentMessageImages] = useState<
-    GeneratedImage[]
-  >([]);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showShareModal, setShowShareModal] = useState(false);
-  const [shareUrl, setShareUrl] = useState<string | null>(null);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
-  const chatScrollPositionRef = useRef(0);
-
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop =
-        chatContainerRef.current.scrollHeight;
-    }
-  }, [messages]);
-
-  const getChatHistory = (): ChatHistory => {
-    return {
-      messages: messages.map((msg) => ({
-        role: msg.role,
-        content: msg.content,
-      })),
-    };
-  };
-
-  const generateResponse = async (userInput: string) => {
-    setIsGenerating(true);
-    try {
-      let response = "";
-      const chatHistory = getChatHistory();
-      const result = await generateFileContent(
-        genAI,
-        userInput,
-        (partialResponse) => {
-          // Update the UI with streaming response
-          setMessages((prev) => {
-            const lastMessage = prev[prev.length - 1];
-            if (lastMessage?.role === "assistant") {
-              return [
-                ...prev.slice(0, -1),
-                {
-                  ...lastMessage,
-                  content: lastMessage.content + partialResponse,
-                  timestamp: Date.now(),
-                },
-              ];
-            }
-            return [
-              ...prev,
-              {
-                role: "assistant",
-                content: partialResponse,
-                timestamp: Date.now(),
-              },
-            ];
-          });
-        },
-        chatHistory
-      );
-
-      return {
-        content: result.explanation,
-        generatedContent: result,
-      };
-    } catch (error) {
-      console.error("Error generating response:", error);
-      return {
-        content: "Sorry, I encountered an error while generating the content.",
-        generatedContent: undefined,
-      };
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isGenerating) return;
-
-    const userMessage: Message = {
-      role: "user",
-      content: input,
-      timestamp: Date.now(),
-    };
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-
-    if (chatMode === "ai-chat") {
-      const aiResponse = await generateResponse(input);
-      setMessages((prev) => [
-        ...prev,
+const AIChat: React.FC<AIChatProps> = ({ editor, isOpen, onClose, autoConvertMarkdown = true }) => {
+    const [chatMode, setChatMode] = useState<ChatMode>('ai-chat');
+    const [messages, setMessages] = useState<Message[]>([
         {
-          role: "assistant",
-          content: aiResponse.content,
-          generatedContent: aiResponse.generatedContent,
-          timestamp: Date.now(),
+            role: 'assistant',
+            content: 'Hi! I can help you generate code or content. What would you like to create?',
         },
-      ]);
-    } else if (chatMode === "comic-generator") {
-      await handleGenerateComicPrompt(input);
-    }
-  };
+    ]);
+    const [input, setInput] = useState('');
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+    const [generatedPrompt, setGeneratedPrompt] = useState<string | null>(null);
+    const [modalImage, setModalImage] = useState<GeneratedImage | null>(null);
+    const [showPromptSuggestions, setShowPromptSuggestions] = useState(false);
+    const [currentMessageImages, setCurrentMessageImages] = useState<GeneratedImage[]>([]);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const chatContainerRef = useRef<HTMLDivElement>(null);
+    const chatScrollPositionRef = useRef(0);
+    const [showShareModal, setShowShareModal] = useState(false);
+    const [shareUrl, setShareUrl] = useState<string | null>(null);
+
+    // Static prompt suggestions based on chat mode
+    const aiChatPromptSuggestions = [
+        'Write a short story about a time traveler stuck in the past',
+        'Create a mystery story set in a small coastal town',
+        'Write a sci-fi story about the first human contact with aliens',
+        'Draft a romance story between rival bookstore owners',
+        'Write a horror story that takes place during a blackout',
+    ];
+
+    const comicGeneratorPromptSuggestions = [
+        'A story of breaking bad walter white and saul goodman',
+        "A short panel series depicting the Titanic sinking from a seagull's POV",
+        "Comic-style retelling of Romeo and Juliet's balcony scene",
+        'A panel showing Frodo destroying the ring at Mount Doom',
+        "A funny reinterpretation of Darth Vader revealing he's Luke's father",
+    ];
+    useEffect(() => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    }, [messages]);
+
+    const getChatHistory = (): ChatHistory => {
+        return {
+            messages: messages.map((msg) => ({
+                role: msg.role,
+                content: msg.content,
+            })),
+        };
+    };
+
+    const generateResponse = async (userInput: string) => {
+        setIsGenerating(true);
+        try {
+            let response = '';
+            const chatHistory = getChatHistory();
+            const result = await generateFileContent(
+                genAI,
+                userInput,
+                (partialResponse) => {
+                    // Update the UI with streaming response
+                    setMessages((prev) => {
+                        const lastMessage = prev[prev.length - 1];
+                        if (lastMessage?.role === 'assistant') {
+                            return [
+                                ...prev.slice(0, -1),
+                                {
+                                    ...lastMessage,
+                                    content: lastMessage.content + partialResponse,
+                                    timestamp: Date.now(),
+                                },
+                            ];
+                        }
+                        return [
+                            ...prev,
+                            {
+                                role: 'assistant',
+                                content: partialResponse,
+                                timestamp: Date.now(),
+                            },
+                        ];
+                    });
+                },
+                chatHistory
+            );
+
+            return {
+                content: result.explanation,
+                generatedContent: result,
+            };
+        } catch (error) {
+            console.error('Error generating response:', error);
+            return {
+                content: 'Sorry, I encountered an error while generating the content.',
+                generatedContent: undefined,
+            };
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
+    const handleSendMessage = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!input.trim() || isGenerating) return;
+
+        const userMessage: Message = {
+            role: 'user',
+            content: input,
+            timestamp: Date.now(),
+        };
+        setMessages((prev) => [...prev, userMessage]);
+        setInput('');
+
+        if (chatMode === 'ai-chat') {
+            const aiResponse = await generateResponse(input);
+            setMessages((prev) => [
+                ...prev,
+                {
+                    role: 'assistant',
+                    content: aiResponse.content,
+                    generatedContent: aiResponse.generatedContent,
+                    timestamp: Date.now(),
+                },
+            ]);
+        } else if (chatMode === 'comic-generator') {
+            await handleGenerateComicPrompt(input);
+        }
+    };
 
   const convertMarkdownToHtml = async (markdown: string): Promise<string> => {
     try {
@@ -311,793 +313,722 @@ const AIChat: React.FC<AIChatProps> = ({
     });
   };
 
-  const generatePDF = async (images: GeneratedImage[]) => {
-    if (!images || images.length === 0) return;
+    // Function to get file extension from mime type
+    const getFileExtension = (mimeType: string): string => {
+        const extensions: Record<string, string> = {
+            'image/jpeg': 'jpg',
+            'image/png': 'png',
+            'image/gif': 'gif',
+            'image/webp': 'webp',
+            'image/svg+xml': 'svg',
+        };
 
-    try {
-      // Dynamic import jsPDF to avoid server-side rendering issues
-      const { default: jsPDF } = await import("jspdf");
-
-      const doc = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-      });
-
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-
-      // Add each image to the PDF
-      for (let i = 0; i < images.length; i++) {
-        if (i > 0) {
-          doc.addPage();
-        }
-
-        const image = images[i];
-        const imgData = `data:${image.mimeType};base64,${image.data}`;
-
-        // Add image to the page with proper aspect ratio
-        doc.addImage(
-          imgData,
-          "JPEG",
-          0,
-          0,
-          pageWidth,
-          pageHeight,
-          undefined,
-          "FAST"
-        );
-      }
-
-      // Save the PDF
-      doc.save(`comic-panels-${Date.now()}.pdf`);
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-    }
-  };
-
-  // Function to get file extension from mime type
-  const getFileExtension = (mimeType: string): string => {
-    const extensions: Record<string, string> = {
-      "image/jpeg": "jpg",
-      "image/png": "png",
-      "image/gif": "gif",
-      "image/webp": "webp",
-      "image/svg+xml": "svg",
+        return extensions[mimeType] || 'png';
     };
 
-    return extensions[mimeType] || "png";
-  };
+    const getComicChatHistory = () => {
+        // Filter messages to only include those relevant to comic generation
+        // This includes user inputs and assistant responses with generatedPrompt
+        return messages.filter((msg) => chatMode === 'comic-generator' && (msg.role === 'user' || msg.generatedPrompt));
+    };
 
-  const getComicChatHistory = () => {
-    // Filter messages to only include those relevant to comic generation
-    // This includes user inputs and assistant responses with generatedPrompt
-    return messages.filter(
-      (msg) =>
-        chatMode === "comic-generator" &&
-        (msg.role === "user" || msg.generatedPrompt)
-    );
-  };
-
-  const handleGenerateComicPrompt = async (storyInput: string) => {
-    try {
-      setIsGenerating(true);
-
-      // Get relevant chat history for context
-      const comicHistory = getComicChatHistory();
-
-      const response = await fetch("/api/generate-comic-prompt", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          story: storyInput,
-          history: comicHistory,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to generate comic prompt");
-      }
-
-      const data = await response.json();
-      const prompt = data.prompt || "";
-      setGeneratedPrompt(prompt);
-
-      // Add assistant message with the generated prompt
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: "I've created a comic prompt based on your story:",
-          generatedPrompt: prompt,
-          timestamp: Date.now(),
-        },
-      ]);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "An unknown error occurred";
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: `Error: ${errorMessage}`,
-          timestamp: Date.now(),
-        },
-      ]);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  const handleGenerateComicImage = async (prompt: string) => {
-    try {
-      setIsGeneratingImage(true);
-
-      const response = await fetch("/api/generate-image", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to generate image");
-      }
-
-      const data = await response.json();
-
-      // Add assistant message with the generated images
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: data.text || "Here's your generated comic:",
-          generatedImages: data.images || [],
-          timestamp: Date.now(),
-        },
-      ]);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "An unknown error occurred";
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: `Error generating comic: ${errorMessage}`,
-          timestamp: Date.now(),
-        },
-      ]);
-    } finally {
-      setIsGeneratingImage(false);
-    }
-  };
-
-  const createAndShareReel = async (images: GeneratedImage[]) => {
-    if (!images || images.length === 0) {
-      toast.error("No images to create slideshow");
-      return;
-    }
-
-    try {
-      // Show loading indicator
-      const loadingToast = toast.loading("Creating your reel...");
-
-      // Log the images being processed
-      console.log(`Processing ${images.length} images for slideshow`);
-
-      // Convert images to files for upload
-      const imageFiles = await Promise.all(
-        images.map(async (image, index) => {
-          try {
-            const blob = await fetch(
-              `data:${image.mimeType};base64,${image.data}`
-            ).then((r) => r.blob());
-
-            // Log each image conversion
-            console.log(`Converted image ${index} (${blob.size} bytes)`);
-
-            return new File(
-              [blob],
-              `image-${index}.${getFileExtension(image.mimeType)}`,
-              { type: image.mimeType }
-            );
-          } catch (err) {
-            console.error(`Error converting image ${index}:`, err);
-            throw err;
-          }
-        })
-      );
-
-      // Verify we have files to upload
-      if (imageFiles.length === 0) {
-        toast.dismiss(loadingToast);
-        toast.error("Failed to prepare images");
-        return;
-      }
-
-      console.log(
-        `Successfully prepared ${imageFiles.length} files for upload`
-      );
-
-      // Create FormData for API request
-      const formData = new FormData();
-      imageFiles.forEach((file, index) => {
-        formData.append("images", file);
-        console.log(`Added image ${index} to FormData (${file.size} bytes)`);
-      });
-
-      // Optional settings for the reel
-      formData.append("duration", "2000"); // milliseconds per image
-      formData.append("audio", "default"); // Use default audio or specify audio ID
-
-      console.log("Sending request to create-reel API");
-
-      // Send request to server to create reel
-      const response = await fetch("/api/create-reel", {
-        method: "POST",
-        body: formData,
-      });
-
-      // Check for HTTP errors
-      if (!response.ok) {
-        let errorMessage = "Failed to create reel";
-
+    const handleGenerateComicPrompt = async (storyInput: string) => {
         try {
-          const errorData = await response.json();
-          console.error("Server error details:", errorData);
-          errorMessage = errorData.error || errorMessage;
-        } catch (jsonError) {
-          console.error("Could not parse error response:", jsonError);
-          console.error("Response status:", response.status);
-          console.error(
-            "Response text:",
-            await response.text().catch(() => "Could not read response text")
-          );
+            setIsGenerating(true);
+
+            // Get relevant chat history for context
+            const comicHistory = getComicChatHistory();
+
+            const response = await fetch('/api/generate-comic-prompt', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    story: storyInput,
+                    history: comicHistory,
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to generate comic prompt');
+            }
+
+            const data = await response.json();
+            const prompt = data.prompt || '';
+            setGeneratedPrompt(prompt);
+
+            // Add assistant message with the generated prompt
+            setMessages((prev) => [
+                ...prev,
+                {
+                    role: 'assistant',
+                    content: "I've created a comic prompt based on your story:",
+                    generatedPrompt: prompt,
+                    timestamp: Date.now(),
+                },
+            ]);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+            setMessages((prev) => [
+                ...prev,
+                {
+                    role: 'assistant',
+                    content: `Error: ${errorMessage}`,
+                    timestamp: Date.now(),
+                },
+            ]);
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
+    const handleGenerateComicImage = async (prompt: string) => {
+        try {
+            setIsGeneratingImage(true);
+
+            const response = await fetch('/api/generate-image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ prompt }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to generate image');
+            }
+
+            const data = await response.json();
+
+            // Add assistant message with the generated images
+            setMessages((prev) => [
+                ...prev,
+                {
+                    role: 'assistant',
+                    content: data.text || "Here's your generated comic:",
+                    generatedImages: data.images || [],
+                    timestamp: Date.now(),
+                },
+            ]);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+            setMessages((prev) => [
+                ...prev,
+                {
+                    role: 'assistant',
+                    content: `Error generating comic: ${errorMessage}`,
+                    timestamp: Date.now(),
+                },
+            ]);
+        } finally {
+            setIsGeneratingImage(false);
+        }
+    };
+
+    const createAndShareReel = async (images: GeneratedImage[]) => {
+        if (!images || images.length === 0) {
+            toast.error('No images to create slideshow');
+            return;
         }
 
-        toast.dismiss(loadingToast);
-        toast.error(errorMessage);
-        return;
-      }
+        try {
+            // Show loading indicator
+            const loadingToast = toast.loading('Creating your reel...');
 
-      console.log("Received successful response from server");
-      const data = await response.json();
-      toast.dismiss(loadingToast);
-      toast.success("Reel created successfully!");
+            // Log the images being processed
+            console.log(`Processing ${images.length} images for slideshow`);
 
-      // Automatically download the slideshow as a ZIP
-      downloadSlideshow(data.reelUrl.split("/").pop());
+            // Convert images to files for upload
+            const imageFiles = await Promise.all(
+                images.map(async (image, index) => {
+                    try {
+                        const blob = await fetch(`data:${image.mimeType};base64,${image.data}`).then((r) => r.blob());
 
-      // Also show sharing options
-      if (navigator.share) {
-        await navigator.share({
-          title: "My Comic Reel",
-          text: "Check out this comic reel I created!",
-          url: data.reelUrl,
-        });
-      } else {
-        // Fallback - copy link to clipboard
-        await navigator.clipboard.writeText(data.reelUrl);
-        toast.success("Reel link copied to clipboard!");
+                        // Log each image conversion
+                        console.log(`Converted image ${index} (${blob.size} bytes)`);
 
-        // Open sharing options in a modal
-        setShareUrl(data.reelUrl);
-        setShowShareModal(true);
-      }
-    } catch (error) {
-      console.error("Error creating or sharing reel:", error);
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Failed to create or share reel"
-      );
-    }
-  };
-
-  // Add this download function to your component
-  const downloadSlideshow = async (slideshowId: string) => {
-    if (!slideshowId) return;
-
-    try {
-      // Call the API to generate a zip file
-      const response = await fetch(`/api/download-slideshow?id=${slideshowId}`);
-
-      if (!response.ok) {
-        console.error("Failed to download slideshow");
-        return;
-      }
-
-      // Get the blob from the response
-      const blob = await response.blob();
-
-      // Create a download link
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.style.display = "none";
-      a.href = url;
-      a.download = `slideshow-${slideshowId}.zip`;
-      document.body.appendChild(a);
-      a.click();
-
-      // Clean up
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    } catch (error) {
-      console.error("Error downloading slideshow:", error);
-    }
-  };
-
-  const renderMessage = (message: Message) => {
-    if (message.role === "user") {
-      return <p className="text-white">{message.content}</p>;
-    }
-
-    if (chatMode === "ai-chat" && message.generatedContent) {
-      return (
-        <div>
-          <p className="mb-2">{message.generatedContent.explanation}</p>
-          <pre className="bg-gray-800 text-white p-2 rounded text-sm overflow-x-auto">
-            <code>{message.generatedContent.content}</code>
-          </pre>
-          <button
-            onClick={() => insertGeneratedContent(message.generatedContent!)}
-            className="mt-2 text-sm bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-          >
-            Insert into Editor
-          </button>
-        </div>
-      );
-    } else if (chatMode === "comic-generator" && message.generatedPrompt) {
-      return (
-        <div>
-          <p className="mb-2">{message.content}</p>
-          <div className="p-4 bg-gray-100 rounded-md">
-            <pre className="whitespace-pre-wrap text-sm">
-              {message.generatedPrompt}
-            </pre>
-          </div>
-          <button
-            onClick={() => handleGenerateComicImage(message.generatedPrompt!)}
-            disabled={isGeneratingImage}
-            className="mt-2 text-sm bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 disabled:bg-green-300"
-          >
-            {isGeneratingImage
-              ? "Generating Comic..."
-              : "Generate Comic Images"}
-          </button>
-        </div>
-      );
-    } else if (
-      chatMode === "comic-generator" &&
-      message.generatedImages &&
-      message.generatedImages.length > 0
-    ) {
-      return (
-        <div>
-          <p className="mb-2">{message.content}</p>
-          <div
-            className={`grid ${
-              message.generatedImages.length > 1 ? "grid-cols-2" : "grid-cols-1"
-            } gap-4 mt-2`}
-          >
-            {message.generatedImages.map((image, index) => (
-              <div
-                key={index}
-                className="border rounded-lg overflow-hidden shadow-md"
-              >
-                <div className="relative aspect-square group cursor-pointer">
-                  <img
-                    src={`data:${image.mimeType};base64,${image.data}`}
-                    alt={`Comic ${index + 1}`}
-                    className="object-contain w-full h-full"
-                    onClick={() =>
-                      openImageModal(
-                        image,
-                        message.generatedImages || [],
-                        index
-                      )
+                        return new File([blob], `image-${index}.${getFileExtension(image.mimeType)}`, { type: image.mimeType });
+                    } catch (err) {
+                        console.error(`Error converting image ${index}:`, err);
+                        throw err;
                     }
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                })
+            );
+
+            // Verify we have files to upload
+            if (imageFiles.length === 0) {
+                toast.dismiss(loadingToast);
+                toast.error('Failed to prepare images');
+                return;
+            }
+
+            console.log(`Successfully prepared ${imageFiles.length} files for upload`);
+
+            // Create FormData for API request
+            const formData = new FormData();
+            imageFiles.forEach((file, index) => {
+                formData.append('images', file);
+                console.log(`Added image ${index} to FormData (${file.size} bytes)`);
+            });
+
+            // Optional settings for the reel
+            formData.append('duration', '2000'); // milliseconds per image
+            formData.append('audio', 'default'); // Use default audio or specify audio ID
+
+            console.log('Sending request to create-reel API');
+
+            // Send request to server to create reel
+            const response = await fetch('/api/create-reel', {
+                method: 'POST',
+                body: formData,
+            });
+
+            // Check for HTTP errors
+            if (!response.ok) {
+                let errorMessage = 'Failed to create reel';
+
+                try {
+                    const errorData = await response.json();
+                    console.error('Server error details:', errorData);
+                    errorMessage = errorData.error || errorMessage;
+                } catch (jsonError) {
+                    console.error('Could not parse error response:', jsonError);
+                    console.error('Response status:', response.status);
+                    console.error('Response text:', await response.text().catch(() => 'Could not read response text'));
+                }
+
+                toast.dismiss(loadingToast);
+                toast.error(errorMessage);
+                return;
+            }
+
+            console.log('Received successful response from server');
+            const data = await response.json();
+            toast.dismiss(loadingToast);
+            toast.success('Reel created successfully!');
+
+            // Automatically download the slideshow as a ZIP
+            downloadSlideshow(data.reelUrl.split('/').pop());
+
+            // Also show sharing options
+            if (navigator.share) {
+                await navigator.share({
+                    title: 'My Comic Reel',
+                    text: 'Check out this comic reel I created!',
+                    url: data.reelUrl,
+                });
+            } else {
+                // Fallback - copy link to clipboard
+                await navigator.clipboard.writeText(data.reelUrl);
+                toast.success('Reel link copied to clipboard!');
+
+                // Open sharing options in a modal
+                setShareUrl(data.reelUrl);
+                setShowShareModal(true);
+            }
+        } catch (error) {
+            console.error('Error creating or sharing reel:', error);
+            toast.error(error instanceof Error ? error.message : 'Failed to create or share reel');
+        }
+    };
+
+    const generatePDF = async (images: GeneratedImage[]) => {
+        if (!images || images.length === 0) return;
+
+        try {
+            // Dynamic import jsPDF to avoid server-side rendering issues
+            const { default: jsPDF } = await import('jspdf');
+
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+            });
+
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+
+            // Add each image to the PDF
+            for (let i = 0; i < images.length; i++) {
+                if (i > 0) {
+                    doc.addPage();
+                }
+
+                const image = images[i];
+                const imgData = `data:${image.mimeType};base64,${image.data}`;
+
+                // Add image to the page with proper aspect ratio
+                doc.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
+            }
+
+            // Save the PDF
+            doc.save(`comic-panels-${Date.now()}.pdf`);
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+        }
+    };
+    // Add this download function to your component
+    const downloadSlideshow = async (slideshowId: string) => {
+        if (!slideshowId) return;
+
+        try {
+            // Call the API to generate a zip file
+            const response = await fetch(`/api/download-slideshow?id=${slideshowId}`);
+
+            if (!response.ok) {
+                console.error('Failed to download slideshow');
+                return;
+            }
+
+            // Get the blob from the response
+            const blob = await response.blob();
+
+            // Create a download link
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `slideshow-${slideshowId}.zip`;
+            document.body.appendChild(a);
+            a.click();
+
+            // Clean up
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } catch (error) {
+            console.error('Error downloading slideshow:', error);
+        }
+    };
+
+    const renderMessage = (message: Message) => {
+        if (message.role === 'user') {
+            return <p className="text-white">{message.content}</p>;
+        }
+
+        if (chatMode === 'ai-chat' && message.generatedContent) {
+            return (
+                <div>
+                    <p className="mb-2">{message.generatedContent.explanation}</p>
+                    <pre className="bg-gray-800 text-white p-2 rounded text-sm overflow-x-auto">
+                        <code>{message.generatedContent.content}</code>
+                    </pre>
                     <button
-                      className="p-2 bg-white rounded-full shadow-md mr-2"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openImageModal(
-                          image,
-                          message.generatedImages || [],
-                          index
-                        );
-                      }}
+                        onClick={() => insertGeneratedContent(message.generatedContent!)}
+                        className="mt-2 text-sm bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
                     >
-                      <ArrowsPointingOutIcon className="w-5 h-5 text-gray-700" />
+                        Insert into Editor
                     </button>
+                </div>
+            );
+        } else if (chatMode === 'comic-generator' && message.generatedPrompt) {
+            return (
+                <div>
+                    <p className="mb-2">{message.content}</p>
+                    <div className="p-4 bg-gray-100 rounded-md">
+                        <pre className="whitespace-pre-wrap text-sm">{message.generatedPrompt}</pre>
+                    </div>
                     <button
-                      className="p-2 bg-white rounded-full shadow-md"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        insertImageIntoEditor(image);
-                      }}
+                        onClick={() => handleGenerateComicImage(message.generatedPrompt!)}
+                        disabled={isGeneratingImage}
+                        className="mt-2 text-sm bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 disabled:bg-green-300"
                     >
-                      <PlusCircleIcon className="w-5 h-5 text-gray-700" />
+                        {isGeneratingImage ? 'Generating Comic...' : 'Generate Comic Images'}
                     </button>
-                  </div>
                 </div>
-                <div className="p-2 bg-gray-50 flex justify-center">
-                  <button
-                    onClick={() => insertImageIntoEditor(image)}
-                    className="text-xs bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                  >
-                    Insert into Editor
-                  </button>
+            );
+        } else if (chatMode === 'comic-generator' && message.generatedImages && message.generatedImages.length > 0) {
+            return (
+                <div>
+                    <p className="mb-2">{message.content}</p>
+                    <div className={`grid ${message.generatedImages.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} gap-4 mt-2`}>
+                        {message.generatedImages.map((image, index) => (
+                            <div key={index} className="border rounded-lg overflow-hidden shadow-md">
+                                <div className="relative aspect-square group cursor-pointer">
+                                    <img
+                                        src={`data:${image.mimeType};base64,${image.data}`}
+                                        alt={`Comic panel ${index + 1}`}
+                                        className="object-contain w-full h-full"
+                                        onClick={() => openImageModal(image, message.generatedImages || [], index)}
+                                    />
+                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                        <button
+                                            className="p-2 bg-white rounded-full shadow-md mr-2"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                openImageModal(image, message.generatedImages || [], index);
+                                            }}
+                                        >
+                                            <ArrowsPointingOutIcon className="w-5 h-5 text-gray-700" />
+                                        </button>
+                                        <button
+                                            className="p-2 bg-white rounded-full shadow-md"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                insertImageIntoEditor(image);
+                                            }}
+                                        >
+                                            <PlusCircleIcon className="w-5 h-5 text-gray-700" />
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="p-2 bg-gray-50 flex justify-center">
+                                    <button
+                                        onClick={() => insertImageIntoEditor(image)}
+                                        className="text-xs bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                                    >
+                                        Insert into Editor
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    }
+            );
+        }
 
-    return <p>{message.content}</p>;
-  };
+        return <p>{message.content}</p>;
+    };
 
-  const switchMode = (mode: ChatMode) => {
-    if (mode !== chatMode) {
-      setChatMode(mode);
+    const switchMode = (mode: ChatMode) => {
+        if (mode !== chatMode) {
+            setChatMode(mode);
 
-      // Only reset messages if switching TO comic-generator mode for the first time
-      // or if switching back to AI chat mode
-      if (mode === "ai-chat" || !messages.some((msg) => msg.generatedPrompt)) {
-        setMessages([
-          {
-            role: "assistant",
-            content:
-              mode === "ai-chat"
-                ? "Hi! I can help you generate code or content. What would you like to create?"
-                : "Hi! I can create comic strips based on your story ideas. What story would you like to turn into a comic? You can also suggest changes to previously generated comics.",
-          },
-        ]);
-      }
+            // Only reset messages if switching TO comic-generator mode for the first time
+            // or if switching back to AI chat mode
+            if (mode === 'ai-chat' || !messages.some((msg) => msg.generatedPrompt)) {
+                setMessages([
+                    {
+                        role: 'assistant',
+                        content:
+                            mode === 'ai-chat'
+                                ? 'Hi! I can help you generate code or content. What would you like to create?'
+                                : 'Hi! I can create comic strips based on your story ideas. What story would you like to turn into a comic? You can also suggest changes to previously generated comics.',
+                    },
+                ]);
+            }
 
-      setInput("");
-      setGeneratedPrompt(null);
-    }
-  };
+            setInput('');
+            setShowPromptSuggestions(false);
+            setGeneratedPrompt(null);
+        }
+    };
 
-  return (
-    <AnimatePresence>
-      {isModalOpen && modalImage && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 backdrop-blur-sm bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-          onClick={closeImageModal}
-        >
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-white bg-opacity-90 rounded-lg max-w-3xl max-h-[90vh] w-full overflow-hidden shadow-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="p-4 flex justify-between items-center border-b">
-              <div className="flex items-center">
-                <h3 className="font-medium mr-2">Comic Panel</h3>
-                {currentMessageImages.length > 1 && (
-                  <span className="text-sm text-gray-500">
-                    {currentImageIndex + 1} of {currentMessageImages.length}
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={downloadAllImages}
-                  className="text-xs bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+    // Handle selecting a prompt suggestion
+    const handleSelectPromptSuggestion = (suggestion: string) => {
+        setInput(suggestion);
+        setShowPromptSuggestions(false);
+    };
+
+    return (
+        <AnimatePresence>
+            {isModalOpen && modalImage && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 backdrop-blur-sm bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+                    onClick={closeImageModal}
                 >
-                  Download All
-                </button>
-                <button
-                  onClick={() => generatePDF(currentMessageImages)}
-                  className="text-xs bg-purple-500 text-white px-3 py-1 rounded hover:bg-purple-600"
-                >
-                  Download as PDF
-                </button>
-                <button
-                  onClick={() => createAndShareReel(currentMessageImages)}
-                  className="p-2.5 rounded-lg hover:bg-secondary/80 transition-colors border border-border"
-                  title="Share the Link"
-                >
-                  <Link className="w-5 h-5 text-foreground" />
-                </button>
-
-                <button
-                  onClick={closeImageModal}
-                  className="p-1 hover:bg-gray-100 rounded"
-                >
-                  <XMarkIcon className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-            <div className="p-4 flex justify-center relative group">
-              <img
-                src={`data:${modalImage.mimeType};base64,${modalImage.data}`}
-                alt="Comic expanded view"
-                className="max-h-[70vh] object-contain"
-              />
-
-              {currentMessageImages.length > 1 && (
-                <>
-                  <button
-                    onClick={() => navigateImages("prev")}
-                    className="absolute left-2 top-1/2 transform -translate-y-1/2 p-2 bg-white bg-opacity-70 rounded-full shadow-md hover:bg-opacity-100 transition-all"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
+                    <motion.div
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.9, opacity: 0 }}
+                        className="bg-white bg-opacity-90 rounded-lg max-w-3xl max-h-[90vh] w-full overflow-hidden shadow-xl"
+                        onClick={(e) => e.stopPropagation()}
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 19l-7-7 7-7"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() => navigateImages("next")}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 bg-white bg-opacity-70 rounded-full shadow-md hover:bg-opacity-100 transition-all"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
+                        <div className="p-4 flex justify-between items-center border-b">
+                            <div className="flex items-center">
+                                <h3 className="font-medium mr-2">Comic Panel</h3>
+                                {currentMessageImages.length > 1 && (
+                                    <span className="text-sm text-gray-500">
+                                        {currentImageIndex + 1} of {currentMessageImages.length}
+                                    </span>
+                                )}
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <button
+                                    onClick={downloadAllImages}
+                                    className="text-xs bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                                >
+                                    Download All
+                                </button>
+                                <button
+                                    onClick={() => generatePDF(currentMessageImages)}
+                                    className="text-xs bg-purple-500 text-white px-3 py-1 rounded hover:bg-purple-600"
+                                >
+                                    Download as PDF
+                                </button>
+                                <button
+                                    onClick={() => createAndShareReel(currentMessageImages)}
+                                    className="p-2.5 rounded-lg hover:bg-secondary/80 transition-colors border border-border"
+                                    title="Share the Link"
+                                >
+                                    <Link className="w-5 h-5 text-foreground" />
+                                </button>
+                                <button onClick={closeImageModal} className="p-1 hover:bg-gray-100 rounded">
+                                    <XMarkIcon className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+                        <div className="p-4 flex justify-center relative group">
+                            <img
+                                src={`data:${modalImage.mimeType};base64,${modalImage.data}`}
+                                alt="Comic expanded view"
+                                className="max-h-[70vh] object-contain"
+                            />
+
+                            {currentMessageImages.length > 1 && (
+                                <>
+                                    <button
+                                        onClick={() => navigateImages('prev')}
+                                        className="absolute left-2 top-1/2 transform -translate-y-1/2 p-2 bg-white bg-opacity-70 rounded-full shadow-md hover:bg-opacity-100 transition-all"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-6 w-6"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M15 19l-7-7 7-7"
+                                            />
+                                        </svg>
+                                    </button>
+                                    <button
+                                        onClick={() => navigateImages('next')}
+                                        className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 bg-white bg-opacity-70 rounded-full shadow-md hover:bg-opacity-100 transition-all"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-6 w-6"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                        <div className="p-4 border-t flex justify-center space-x-4">
+                            <button
+                                onClick={() => downloadImage(modalImage)}
+                                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                            >
+                                Download
+                            </button>
+                            <button
+                                onClick={() => {
+                                    insertImageIntoEditor(modalImage);
+                                    closeImageModal();
+                                }}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                            >
+                                Insert into Editor
+                            </button>
+                        </div>
+                    </motion.div>
+                </motion.div>
+            )}
+
+            {isOpen && (
+                <motion.div
+                    initial={{ x: 300, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: 300, opacity: 0 }}
+                    className="fixed right-0 top-0 h-screen max-w-96 bg-white shadow-lg border-l"
+                >
+                    <div className="flex flex-col h-full">
+                        <div className="p-4 border-b flex justify-between items-center">
+                            <h2 className="text-lg font-semibold">
+                                {chatMode === 'ai-chat' ? 'Content Generator' : 'Comic Generator'}
+                            </h2>
+                            <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded">
+                                <XMarkIcon className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <div className="flex border-b">
+                            <button
+                                onClick={() => switchMode('ai-chat')}
+                                className={`flex-1 py-2 px-4 text-center ${
+                                    chatMode === 'ai-chat' ? 'bg-blue-100 text-blue-700 font-medium' : 'hover:bg-gray-100'
+                                }`}
+                            >
+                                AI Chat
+                            </button>
+                            <button
+                                onClick={() => switchMode('comic-generator')}
+                                className={`flex-1 py-2 px-4 text-center ${
+                                    chatMode === 'comic-generator' ? 'bg-blue-100 text-blue-700 font-medium' : 'hover:bg-gray-100'
+                                }`}
+                            >
+                                Comic Generator
+                            </button>
+                        </div>
+
+                        <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 space-y-4">
+                            {messages.map((message, index) => (
+                                <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                    <div
+                                        className={`max-w-[80%] rounded-lg p-3 ${
+                                            message.role === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-100'
+                                        }`}
+                                    >
+                                        {renderMessage(message)}
+                                    </div>
+                                </div>
+                            ))}
+                            {isGenerating && (
+                                <div className="flex justify-start">
+                                    <div className="bg-gray-100 rounded-lg p-3">
+                                        <div className="animate-pulse">Generating...</div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <form onSubmit={handleSendMessage} className="p-4 border-t">
+                            <div className="flex flex-col w-full relative">
+                                <div className="flex space-x-2">
+                                    <input
+                                        type="text"
+                                        value={input}
+                                        onChange={(e) => {
+                                            setInput(e.target.value);
+                                            // Only show suggestions when user has started typing
+                                            setShowPromptSuggestions(e.target.value.length > 0);
+                                        }}
+                                        onFocus={() => {
+                                            // Show suggestions when input is focused and not empty
+                                            if (input.length > 0) {
+                                                setShowPromptSuggestions(true);
+                                            }
+                                        }}
+                                        onBlur={() => {
+                                            // Hide suggestions with a slight delay to allow for clicks
+                                            setTimeout(() => setShowPromptSuggestions(false), 200);
+                                        }}
+                                        placeholder={
+                                            chatMode === 'ai-chat'
+                                                ? 'Describe the content you need...'
+                                                : 'Enter your story idea for a comic...'
+                                        }
+                                        className="flex-1 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        disabled={isGenerating || isGeneratingImage}
+                                    />
+                                    <button
+                                        type="submit"
+                                        disabled={isGenerating || isGeneratingImage}
+                                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300"
+                                    >
+                                        {chatMode === 'ai-chat' ? 'Generate' : 'Create Comic'}
+                                    </button>
+                                </div>
+
+                                {/* Filtered suggestions when typing - positioned above input */}
+                                {showPromptSuggestions && input.length > 0 && (
+                                    <div className="absolute bottom-full mb-2 left-0 right-0 mx-4 bg-white border rounded-md shadow-lg p-2 z-10">
+                                        <div className="text-sm text-gray-500 font-medium mb-2">
+                                            Need help getting started? Try these prompts...
+                                        </div>
+                                        {(chatMode === 'ai-chat' ? aiChatPromptSuggestions : comicGeneratorPromptSuggestions)
+                                            .filter((suggestion) => suggestion.toLowerCase().includes(input.toLowerCase()))
+                                            .slice(0, 3)
+                                            .map((suggestion, index) => (
+                                                <div
+                                                    key={index}
+                                                    onClick={() => handleSelectPromptSuggestion(suggestion)}
+                                                    className="p-2 bg-gray-100 rounded-md cursor-pointer hover:bg-gray-200 transition-colors mb-1 last:mb-0"
+                                                >
+                                                    {suggestion}
+                                                </div>
+                                            ))}
+                                    </div>
+                                )}
+                            </div>
+                        </form>
+                    </div>
+                </motion.div>
+            )}
+
+            {showShareModal && shareUrl && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 backdrop-blur-sm bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+                    onClick={() => setShowShareModal(false)}
+                >
+                    <motion.div
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.9, opacity: 0 }}
+                        className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl"
+                        onClick={(e) => e.stopPropagation()}
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </button>
-                </>
-              )}
-            </div>
-            <div className="p-4 border-t flex justify-center space-x-4">
-              <button
-                onClick={() => downloadImage(modalImage)}
-                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-              >
-                Download
-              </button>
-              <button
-                onClick={() => {
-                  insertImageIntoEditor(modalImage);
-                  closeImageModal();
-                }}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              >
-                Insert into Editor
-              </button>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-
-      {isOpen && (
-        <motion.div
-          initial={{ x: 300, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          exit={{ x: 300, opacity: 0 }}
-          className="fixed right-0 top-0 h-screen max-w-96 bg-white shadow-lg border-l"
-        >
-          <div className="flex flex-col h-full">
-            <div className="p-4 border-b flex justify-between items-center">
-              <h2 className="text-lg font-semibold">
-                {chatMode === "ai-chat"
-                  ? "Content Generator"
-                  : "Comic Generator"}
-              </h2>
-              <button
-                onClick={onClose}
-                className="p-1 hover:bg-gray-100 rounded"
-              >
-                <XMarkIcon className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="flex border-b">
-              <button
-                onClick={() => switchMode("ai-chat")}
-                className={`flex-1 py-2 px-4 text-center ${
-                  chatMode === "ai-chat"
-                    ? "bg-blue-100 text-blue-700 font-medium"
-                    : "hover:bg-gray-100"
-                }`}
-              >
-                AI Chat
-              </button>
-              <button
-                onClick={() => switchMode("comic-generator")}
-                className={`flex-1 py-2 px-4 text-center ${
-                  chatMode === "comic-generator"
-                    ? "bg-blue-100 text-blue-700 font-medium"
-                    : "hover:bg-gray-100"
-                }`}
-              >
-                Comic Generator
-              </button>
-            </div>
-
-            <div
-              ref={chatContainerRef}
-              className="flex-1 overflow-y-auto p-4 space-y-4"
-            >
-              {messages.map((message, index) => (
-                <div
-                  key={index}
-                  className={`flex ${
-                    message.role === "user" ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  <div
-                    className={`max-w-[80%] rounded-lg p-3 ${
-                      message.role === "user"
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-100"
-                    }`}
-                  >
-                    {renderMessage(message)}
-                  </div>
-                </div>
-              ))}
-              {isGenerating && (
-                <div className="flex justify-start">
-                  <div className="bg-gray-100 rounded-lg p-3">
-                    <div className="animate-pulse">Generating...</div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <form onSubmit={handleSendMessage} className="p-4 border-t">
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder={
-                    chatMode === "ai-chat"
-                      ? "Describe the content you need..."
-                      : "Enter your story idea for a comic..."
-                  }
-                  className="flex-1 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  disabled={isGenerating || isGeneratingImage}
-                />
-                <button
-                  type="submit"
-                  disabled={isGenerating || isGeneratingImage}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300"
-                >
-                  {chatMode === "ai-chat" ? "Generate" : "Create Comic"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </motion.div>
-      )}
-
-      {showShareModal && shareUrl && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 backdrop-blur-sm bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-          onClick={() => setShowShareModal(false)}
-        >
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="text-lg font-bold mb-4">Share your reel</h3>
-            <div className="mb-4">
-              <input
-                type="text"
-                value={shareUrl}
-                readOnly
-                className="w-full p-2 border rounded"
-              />
-            </div>
-            <div className="grid grid-cols-4 gap-4 mb-6">
-              <button
-                onClick={() =>
-                  window.open(
-                    `https://wa.me/?text=${encodeURIComponent(shareUrl)}`,
-                    "_blank"
-                  )
-                }
-                className="p-3 bg-green-500 rounded-full"
-              >
-                <img
-                  src="/icons/whatsapp.svg"
-                  alt="WhatsApp"
-                  className="w-6 h-6"
-                />
-              </button>
-              <button
-                onClick={() =>
-                  window.open(
-                    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-                      shareUrl
-                    )}`,
-                    "_blank"
-                  )
-                }
-                className="p-3 bg-blue-600 rounded-full"
-              >
-                <img
-                  src="/icons/facebook.svg"
-                  alt="Facebook"
-                  className="w-6 h-6"
-                />
-              </button>
-              <button
-                onClick={() =>
-                  window.open(
-                    `https://twitter.com/intent/tweet?url=${encodeURIComponent(
-                      shareUrl
-                    )}`,
-                    "_blank"
-                  )
-                }
-                className="p-3 bg-blue-400 rounded-full"
-              >
-                <img
-                  src="/icons/twitter.svg"
-                  alt="Twitter"
-                  className="w-6 h-6"
-                />
-              </button>
-              <button
-                onClick={() =>
-                  window.open(
-                    `mailto:?subject=Check out my comic reel&body=${encodeURIComponent(
-                      shareUrl
-                    )}`,
-                    "_blank"
-                  )
-                }
-                className="p-3 bg-red-500 rounded-full"
-              >
-                <img src="/icons/mail.svg" alt="Email" className="w-6 h-6" />
-              </button>
-            </div>
-            <div className="flex justify-end">
-              <button
-                onClick={() => setShowShareModal(false)}
-                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-              >
-                Close
-              </button>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
+                        <h3 className="text-lg font-bold mb-4">Share your reel</h3>
+                        <div className="mb-4">
+                            <input type="text" value={shareUrl} readOnly className="w-full p-2 border rounded" />
+                        </div>
+                        <div className="grid grid-cols-4 gap-4 mb-6">
+                            <button
+                                onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(shareUrl)}`, '_blank')}
+                                className="p-3 bg-green-500 rounded-full"
+                            >
+                                <img src="/icons/whatsapp.svg" alt="WhatsApp" className="w-6 h-6" />
+                            </button>
+                            <button
+                                onClick={() =>
+                                    window.open(
+                                        `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+                                        '_blank'
+                                    )
+                                }
+                                className="p-3 bg-blue-600 rounded-full"
+                            >
+                                <img src="/icons/facebook.svg" alt="Facebook" className="w-6 h-6" />
+                            </button>
+                            <button
+                                onClick={() =>
+                                    window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}`, '_blank')
+                                }
+                                className="p-3 bg-blue-400 rounded-full"
+                            >
+                                <img src="/icons/twitter.svg" alt="Twitter" className="w-6 h-6" />
+                            </button>
+                            <button
+                                onClick={() =>
+                                    window.open(
+                                        `mailto:?subject=Check out my comic reel&body=${encodeURIComponent(shareUrl)}`,
+                                        '_blank'
+                                    )
+                                }
+                                className="p-3 bg-red-500 rounded-full"
+                            >
+                                <img src="/icons/mail.svg" alt="Email" className="w-6 h-6" />
+                            </button>
+                        </div>
+                        <div className="flex justify-end">
+                            <button
+                                onClick={() => setShowShareModal(false)}
+                                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </motion.div>
+                </motion.div>
+            )}
+        </AnimatePresence>
+    );
 };
 
 export default AIChat;
