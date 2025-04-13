@@ -4,7 +4,19 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, Star, Settings, Users, FolderKanban, Bell, LogOut, ChevronLeft, Menu, Loader2, BookOpenCheck } from 'lucide-react';
+import {
+    LayoutDashboard,
+    Star,
+    Settings,
+    Users,
+    FolderKanban,
+    Bell,
+    LogOut,
+    ChevronLeft,
+    Menu,
+    Loader2,
+    BookOpenCheck,
+} from 'lucide-react';
 import { auth } from '@/auth';
 import { handleSignOut } from '@/app/actions/auth';
 import { useToast } from '@/components/ui/use-toast';
@@ -46,7 +58,12 @@ const menuItems = [
         title: 'Readers',
         icon: BookOpenCheck,
         path: '/dashboard/readers',
-    }
+    },
+    {
+        title: 'Kanban',
+        icon: FolderKanban,
+        path: '/dashboard/kanban',
+    },
 ];
 
 export default function Sidebar({ session }: { session: any }) {
@@ -123,7 +140,11 @@ export default function Sidebar({ session }: { session: any }) {
                                 <Link key={item.path} href={item.path}>
                                     <div
                                         className={`flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-all group
-                      ${isActive ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground hover:bg-secondary/50 hover:text-secondary-foreground'}`}
+                      ${
+                          isActive
+                              ? 'bg-secondary text-secondary-foreground'
+                              : 'text-muted-foreground hover:bg-secondary/50 hover:text-secondary-foreground'
+                      }`}
                                     >
                                         <item.icon className="w-5 h-5" />
                                         <span className="font-medium">{item.title}</span>
@@ -148,7 +169,9 @@ export default function Sidebar({ session }: { session: any }) {
                                 </div>
                                 <span className="text-sm font-medium text-card-foreground">What's new?</span>
                             </div>
-                            <p className="text-xs text-muted-foreground">Check out the latest updates and features in our changelog.</p>
+                            <p className="text-xs text-muted-foreground">
+                                Check out the latest updates and features in our changelog.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -177,7 +200,9 @@ export default function Sidebar({ session }: { session: any }) {
                                 />
                             ) : (
                                 <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-                                    <span className="text-primary-foreground font-medium">{getInitials(user.name || 'User')}</span>
+                                    <span className="text-primary-foreground font-medium">
+                                        {getInitials(user.name || 'User')}
+                                    </span>
                                 </div>
                             )}
                             <div className="flex-1 hover:cursor-pointer " onClick={() => router.push('/dashboard/profile')}>
