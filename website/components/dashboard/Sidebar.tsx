@@ -4,11 +4,12 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, Star, Settings, Users, FolderKanban, Bell, LogOut, ChevronLeft, Menu, Loader2 } from 'lucide-react';
+import { LayoutDashboard, Star, Settings, Users, FolderKanban, Bell, LogOut, ChevronLeft, Menu, Loader2, BookOpenCheck } from 'lucide-react';
 import { auth } from '@/auth';
 import { handleSignOut } from '@/app/actions/auth';
 import { useToast } from '@/components/ui/use-toast';
 import Image from 'next/image';
+import path from 'path';
 
 const menuItems = [
     {
@@ -41,6 +42,11 @@ const menuItems = [
         icon: LayoutDashboard,
         path: '/dashboard/flow',
     },
+    {
+        title: 'Readers',
+        icon: BookOpenCheck,
+        path: '/dashboard/readers',
+    }
 ];
 
 export default function Sidebar({ session }: { session: any }) {
