@@ -1,20 +1,3 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Editor } from "@tiptap/core";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  ChatBubbleLeftIcon,
-  XMarkIcon,
-  PhotoIcon,
-  ArrowsPointingOutIcon,
-  PlusCircleIcon,
-} from "@heroicons/react/24/outline";
-import { generateFileContent, FileGenerationResponse } from "@/lib/gemini";
-import { genAI } from "@/lib/geminiInstance";
-import { unified } from "unified";
-import remarkParse from "remark-parse";
-import remarkRehype from "remark-rehype";
-import rehypeStringify from "rehype-stringify";
-import remarkGfm from "remark-gfm";
 import React, { useState, useRef, useEffect } from 'react';
 import { Editor } from '@tiptap/core';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -34,22 +17,22 @@ interface AIChatProps {
     autoConvertMarkdown?: boolean;
 }
 
-type ChatMode = "ai-chat" | "comic-generator";
+type ChatMode = 'ai-chat' | 'comic-generator';
 
 interface ChatHistory {
-  messages: Array<{
-    role: "user" | "assistant";
-    content: string;
-  }>;
+    messages: Array<{
+        role: 'user' | 'assistant';
+        content: string;
+    }>;
 }
 
 interface Message {
-  role: "user" | "assistant";
-  content: string;
-  generatedContent?: FileGenerationResponse;
-  timestamp?: number; // Add timestamp for sorting/reference
-  generatedPrompt?: string;
-  generatedImages?: GeneratedImage[];
+    role: 'user' | 'assistant';
+    content: string;
+    generatedContent?: FileGenerationResponse;
+    timestamp?: number; // Add timestamp for sorting/reference
+    generatedPrompt?: string;
+    generatedImages?: GeneratedImage[];
 }
 
 interface GeneratedImage {
@@ -94,56 +77,55 @@ const AIChat: React.FC<AIChatProps> = ({ editor, isOpen, onClose, autoConvertMar
         "A funny reinterpretation of Darth Vader revealing he's Luke's father",
     ];
 
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop =
-        chatContainerRef.current.scrollHeight;
-    }
-  }, [messages]);
+    useEffect(() => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    }, [messages]);
 
-  const getChatHistory = (): ChatHistory => {
-    return {
-      messages: messages.map((msg) => ({
-        role: msg.role,
-        content: msg.content,
-      })),
+    const getChatHistory = (): ChatHistory => {
+        return {
+            messages: messages.map((msg) => ({
+                role: msg.role,
+                content: msg.content,
+            })),
+        };
     };
-  };
 
-  const generateResponse = async (userInput: string) => {
-    setIsGenerating(true);
-    try {
-      let response = "";
-      const chatHistory = getChatHistory();
-      const result = await generateFileContent(
-        genAI,
-        userInput,
-        (partialResponse) => {
-          // Update the UI with streaming response
-          setMessages((prev) => {
-            const lastMessage = prev[prev.length - 1];
-            if (lastMessage?.role === "assistant") {
-              return [
-                ...prev.slice(0, -1),
-                {
-                  ...lastMessage,
-                  content: lastMessage.content + partialResponse,
-                  timestamp: Date.now(),
+    const generateResponse = async (userInput: string) => {
+        setIsGenerating(true);
+        try {
+            let response = '';
+            const chatHistory = getChatHistory();
+            const result = await generateFileContent(
+                genAI,
+                userInput,
+                (partialResponse) => {
+                    // Update the UI with streaming response
+                    setMessages((prev) => {
+                        const lastMessage = prev[prev.length - 1];
+                        if (lastMessage?.role === 'assistant') {
+                            return [
+                                ...prev.slice(0, -1),
+                                {
+                                    ...lastMessage,
+                                    content: lastMessage.content + partialResponse,
+                                    timestamp: Date.now(),
+                                },
+                            ];
+                        }
+                        return [
+                            ...prev,
+                            {
+                                role: 'assistant',
+                                content: partialResponse,
+                                timestamp: Date.now(),
+                            },
+                        ];
+                    });
                 },
-              ];
-            }
-            return [
-              ...prev,
-              {
-                role: "assistant",
-                content: partialResponse,
-                timestamp: Date.now(),
-              },
-            ];
-          });
-        },
-        chatHistory
-      );
+                chatHistory
+            );
 
             return {
                 content: result.explanation,
