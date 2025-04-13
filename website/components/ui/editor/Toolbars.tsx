@@ -50,7 +50,7 @@ export function SelectionToolbar({ editor }: Props) {
             <Toolbar.Separator className="w-[1px] h-7 bg-border mx-1" />
             <Toolbar.SectionInline className="flex items-center gap-1" />
             <Toolbar.Separator className="w-[1px] h-7 bg-border mx-1" />
-            <Toolbar.SectionCollaboration className="flex items-center gap-1" />
+           <div className="flex items-center gap-2 p-2"> <Toolbar.SectionCollaboration  /></div>
         </FloatingToolbar>
     );
 }
