@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Download, FileText, BookOpen, Calendar, ArrowRight, Check } from "lucide-react";
 import { motion } from "framer-motion";
+import PDFViewerModal from "@/components/PDFViewerModal";
 
 // Interface for PDF file metadata
 interface PDFFile {
@@ -18,21 +19,21 @@ const PDFReader = () => {
   const [pdfFiles] = useState<PDFFile[]>([
     {
       id: "1",
-      name: "Comic Panels 1",
+      name: "Comic 1",
       path: "/books/comic-panels-1744500235574.pdf",
       description: "Single page comic panel",
       dateAdded: "2024-04-13",
     },
     {
       id: "2",
-      name: "Comic Panels 2",
+      name: "Comic 2",
       path: "/books/comic-panels-1744500562340.pdf",
       description: "Two panel comic sequence",
       dateAdded: "2024-04-12",
     },
     {
       id: "3",
-      name: "Comic Panels 3",
+      name: "Comic 3",
       path: "/books/comic-panels-1744497577315.pdf",
       description: "Six panel comic story",
       dateAdded: "2024-04-10",
@@ -40,21 +41,28 @@ const PDFReader = () => {
   ]);
 
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [selectedPdf, setSelectedPdf] = useState<PDFFile | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleDownload = (file: PDFFile) => {
     setDownloadingId(file.id);
-    
+
     const link = document.createElement("a");
     link.href = file.path;
     link.download = file.name;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     // Show download animation for 1.5 seconds
     setTimeout(() => {
       setDownloadingId(null);
     }, 1500);
+  };
+
+  const handleCardClick = (file: PDFFile) => {
+    setSelectedPdf(file);
+    setIsModalOpen(true);
   };
 
   // Animation variants for framer-motion
@@ -100,7 +108,8 @@ const PDFReader = () => {
                 y: -5, 
                 boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)" 
               }}
-              className="bg-white rounded-xl overflow-hidden shadow-lg transition-all duration-300"
+              className="bg-white rounded-xl overflow-hidden shadow-lg transition-all duration-300 cursor-pointer"
+              onClick={() => handleCardClick(file)}
             >
               {/* Card header with gradient */}
               <div className="h-3 bg-gradient-to-r from-[#979d57] via-[#edd8da] to-[#e6e5e4]"></div>
@@ -130,7 +139,10 @@ const PDFReader = () => {
                 </div>
                 
                 <motion.button
-                  onClick={() => handleDownload(file)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDownload(file);
+                  }}
                   whileTap={{ scale: 0.95 }}
                   className={`w-full py-3 px-4 rounded-lg flex items-center justify-center font-medium transition-colors ${
                     downloadingId === file.id
@@ -154,6 +166,13 @@ const PDFReader = () => {
             </motion.div>
           ))}
         </motion.div>
+
+        <PDFViewerModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          pdfPath={selectedPdf?.path || ""}
+          fileName={selectedPdf?.name || ""}
+        />
 
         {pdfFiles.length === 0 && (
           <motion.div

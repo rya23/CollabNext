@@ -533,7 +533,7 @@ const AIChat: React.FC<AIChatProps> = ({
                 <div className="relative aspect-square group cursor-pointer">
                   <img
                     src={`data:${image.mimeType};base64,${image.data}`}
-                    alt={`Comic panel ${index + 1}`}
+                    alt={`Comic ${index + 1}`}
                     className="object-contain w-full h-full"
                     onClick={() =>
                       openImageModal(
@@ -659,7 +659,7 @@ const AIChat: React.FC<AIChatProps> = ({
             <div className="p-4 flex justify-center relative group">
               <img
                 src={`data:${modalImage.mimeType};base64,${modalImage.data}`}
-                alt="Comic panel expanded view"
+                alt="Comic expanded view"
                 className="max-h-[70vh] object-contain"
               />
 
