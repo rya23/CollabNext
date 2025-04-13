@@ -57,6 +57,7 @@ import {
   DownloadIcon,
   GitCompareArrows,
   SaveAll,
+  Share,
 } from "lucide-react";
 
 // Firebase config - Replace with your own
@@ -571,7 +572,8 @@ function EditorWithStorage({ fileId }: TextEditorProps) {
                   onClick={() => setCreateVersionDialogOpen(true)}
                   className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
                 >
-                  <SaveAll className="w-4 h-4 mr-1" />
+                  {/* <SaveAll className="w-4 h-4 mr-1" /> */}
+                  Save Version
                 </button>
               </div>
 
@@ -580,27 +582,27 @@ function EditorWithStorage({ fileId }: TextEditorProps) {
               </div>
             </div>
           </div>
-          <div className={styles.editorPanel}>
-            <EditorContent editor={editor} className={styles.editorContainer} />
-            <FloatingComposer editor={editor} style={{ width: 350 }} />
+            <div className={`${styles.editorPanel} inline-editor-container`}>
+            <EditorContent editor={editor} className={`${styles.editorContainer} inline-editor-content`} />
+            <FloatingComposer editor={editor} style={{ minWidth: 350 }} />
             <FloatingThreads threads={threads} editor={editor} />
             {editor && <TextSelectionToolbar editor={editor} />}
             {editor && (
               <AIChat
-                editor={editor}
-                isOpen={isAIChatOpen}
-                onClose={() => setIsAIChatOpen(false)}
+              editor={editor}
+              isOpen={isAIChatOpen}
+              onClose={() => setIsAIChatOpen(false)}
               />
             )}
             {editor && <Autocomplete editor={editor} />}
             {editor && (
               <StoryAnalysis
-                editor={editor}
-                isVisible={showAnalysis}
-                onClose={() => setShowAnalysis(false)}
+              editor={editor}
+              isVisible={showAnalysis}
+              onClose={() => setShowAnalysis(false)}
               />
             )}
-          </div>
+            </div>
         </div>
       </div>
       {isSaving && (

@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   ChevronDown,
   ChevronRight,
@@ -15,6 +16,7 @@ import {
   FileCode,
   FileImage,
   FilePen,
+  ChevronLeft,
 } from "lucide-react";
 import {
   Dialog,
@@ -129,6 +131,7 @@ export default function FileSidebar({
   } | null>(null);
   const [newItemName, setNewItemName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   // Fetch files and folders on mount
   useEffect(() => {
@@ -546,7 +549,7 @@ export default function FileSidebar({
         </div>
       </div>
 
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1 flex justify-center">
         <div className="py-2">
           {isLoading && files.length === 0 && folders.length === 0 ? (
             <div className="flex items-center justify-center py-8">
@@ -562,6 +565,16 @@ export default function FileSidebar({
           ) : (
             renderTree(null)
           )}
+        </div>
+        <div className="absolute bottom-[5rem] left-0 right-0 p-2 border-t border-[#1F1F1F] flex items-center justify-center">
+          <Button
+            variant="ghost"
+            className="flex items-center gap-2 text-white hover:bg-gray-100 w-full justify-start px-3 py-2 rounded-md transition-colors"
+            onClick={() => router.push("/dashboard")}
+          >
+            <ChevronLeft size={16} />
+            <span>Back</span>
+          </Button>
         </div>
       </ScrollArea>
 

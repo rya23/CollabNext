@@ -60,6 +60,11 @@ const menuItems = [
         path: '/dashboard/readers',
     },
     {
+        title: 'Community',
+        icon: Users,
+        path: '/dashboard/community',
+    },
+    {
         title: 'Kanban',
         icon: FolderKanban,
         path: '/dashboard/kanban',
