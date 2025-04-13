@@ -46,6 +46,11 @@ const menuItems = [
         title: 'Readers',
         icon: BookOpenCheck,
         path: '/dashboard/readers',
+    },
+    {
+        title: 'Community',
+        icon: Users,
+        path: '/dashboard/community',
     }
 ];
 
