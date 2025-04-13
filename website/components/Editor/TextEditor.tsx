@@ -57,6 +57,7 @@ import {
   DownloadIcon,
   GitCompareArrows,
   SaveAll,
+  Share,
 } from "lucide-react";
 
 // Firebase config - Replace with your own
