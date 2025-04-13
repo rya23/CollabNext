@@ -15,6 +15,8 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import rehypeStringify from "rehype-stringify";
 import remarkGfm from "remark-gfm";
+import { Link, Share } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 interface AIChatProps {
   editor: Editor;
@@ -70,6 +72,8 @@ const AIChat: React.FC<AIChatProps> = ({
   >([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const chatScrollPositionRef = useRef(0);
 
@@ -472,6 +476,161 @@ const AIChat: React.FC<AIChatProps> = ({
     }
   };
 
+  const createAndShareReel = async (images: GeneratedImage[]) => {
+    if (!images || images.length === 0) {
+      toast.error("No images to create slideshow");
+      return;
+    }
+
+    try {
+      // Show loading indicator
+      const loadingToast = toast.loading("Creating your reel...");
+
+      // Log the images being processed
+      console.log(`Processing ${images.length} images for slideshow`);
+
+      // Convert images to files for upload
+      const imageFiles = await Promise.all(
+        images.map(async (image, index) => {
+          try {
+            const blob = await fetch(
+              `data:${image.mimeType};base64,${image.data}`
+            ).then((r) => r.blob());
+
+            // Log each image conversion
+            console.log(`Converted image ${index} (${blob.size} bytes)`);
+
+            return new File(
+              [blob],
+              `image-${index}.${getFileExtension(image.mimeType)}`,
+              { type: image.mimeType }
+            );
+          } catch (err) {
+            console.error(`Error converting image ${index}:`, err);
+            throw err;
+          }
+        })
+      );
+
+      // Verify we have files to upload
+      if (imageFiles.length === 0) {
+        toast.dismiss(loadingToast);
+        toast.error("Failed to prepare images");
+        return;
+      }
+
+      console.log(
+        `Successfully prepared ${imageFiles.length} files for upload`
+      );
+
+      // Create FormData for API request
+      const formData = new FormData();
+      imageFiles.forEach((file, index) => {
+        formData.append("images", file);
+        console.log(`Added image ${index} to FormData (${file.size} bytes)`);
+      });
+
+      // Optional settings for the reel
+      formData.append("duration", "2000"); // milliseconds per image
+      formData.append("audio", "default"); // Use default audio or specify audio ID
+
+      console.log("Sending request to create-reel API");
+
+      // Send request to server to create reel
+      const response = await fetch("/api/create-reel", {
+        method: "POST",
+        body: formData,
+      });
+
+      // Check for HTTP errors
+      if (!response.ok) {
+        let errorMessage = "Failed to create reel";
+
+        try {
+          const errorData = await response.json();
+          console.error("Server error details:", errorData);
+          errorMessage = errorData.error || errorMessage;
+        } catch (jsonError) {
+          console.error("Could not parse error response:", jsonError);
+          console.error("Response status:", response.status);
+          console.error(
+            "Response text:",
+            await response.text().catch(() => "Could not read response text")
+          );
+        }
+
+        toast.dismiss(loadingToast);
+        toast.error(errorMessage);
+        return;
+      }
+
+      console.log("Received successful response from server");
+      const data = await response.json();
+      toast.dismiss(loadingToast);
+      toast.success("Reel created successfully!");
+
+      // Automatically download the slideshow as a ZIP
+      downloadSlideshow(data.reelUrl.split("/").pop());
+
+      // Also show sharing options
+      if (navigator.share) {
+        await navigator.share({
+          title: "My Comic Reel",
+          text: "Check out this comic reel I created!",
+          url: data.reelUrl,
+        });
+      } else {
+        // Fallback - copy link to clipboard
+        await navigator.clipboard.writeText(data.reelUrl);
+        toast.success("Reel link copied to clipboard!");
+
+        // Open sharing options in a modal
+        setShareUrl(data.reelUrl);
+        setShowShareModal(true);
+      }
+    } catch (error) {
+      console.error("Error creating or sharing reel:", error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to create or share reel"
+      );
+    }
+  };
+
+  // Add this download function to your component
+  const downloadSlideshow = async (slideshowId: string) => {
+    if (!slideshowId) return;
+
+    try {
+      // Call the API to generate a zip file
+      const response = await fetch(`/api/download-slideshow?id=${slideshowId}`);
+
+      if (!response.ok) {
+        console.error("Failed to download slideshow");
+        return;
+      }
+
+      // Get the blob from the response
+      const blob = await response.blob();
+
+      // Create a download link
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = url;
+      a.download = `slideshow-${slideshowId}.zip`;
+      document.body.appendChild(a);
+      a.click();
+
+      // Clean up
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error("Error downloading slideshow:", error);
+    }
+  };
+
   const renderMessage = (message: Message) => {
     if (message.role === "user") {
       return <p className="text-white">{message.content}</p>;
@@ -648,6 +807,14 @@ const AIChat: React.FC<AIChatProps> = ({
                 >
                   Download as PDF
                 </button>
+                <button
+                  onClick={() => createAndShareReel(currentMessageImages)}
+                  className="p-2.5 rounded-lg hover:bg-secondary/80 transition-colors border border-border"
+                  title="Share the Link"
+                >
+                  <Link className="w-5 h-5 text-foreground" />
+                </button>
+
                 <button
                   onClick={closeImageModal}
                   className="p-1 hover:bg-gray-100 rounded"
@@ -827,6 +994,106 @@ const AIChat: React.FC<AIChatProps> = ({
               </div>
             </form>
           </div>
+        </motion.div>
+      )}
+
+      {showShareModal && shareUrl && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 backdrop-blur-sm bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+          onClick={() => setShowShareModal(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-bold mb-4">Share your reel</h3>
+            <div className="mb-4">
+              <input
+                type="text"
+                value={shareUrl}
+                readOnly
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div className="grid grid-cols-4 gap-4 mb-6">
+              <button
+                onClick={() =>
+                  window.open(
+                    `https://wa.me/?text=${encodeURIComponent(shareUrl)}`,
+                    "_blank"
+                  )
+                }
+                className="p-3 bg-green-500 rounded-full"
+              >
+                <img
+                  src="/icons/whatsapp.svg"
+                  alt="WhatsApp"
+                  className="w-6 h-6"
+                />
+              </button>
+              <button
+                onClick={() =>
+                  window.open(
+                    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                      shareUrl
+                    )}`,
+                    "_blank"
+                  )
+                }
+                className="p-3 bg-blue-600 rounded-full"
+              >
+                <img
+                  src="/icons/facebook.svg"
+                  alt="Facebook"
+                  className="w-6 h-6"
+                />
+              </button>
+              <button
+                onClick={() =>
+                  window.open(
+                    `https://twitter.com/intent/tweet?url=${encodeURIComponent(
+                      shareUrl
+                    )}`,
+                    "_blank"
+                  )
+                }
+                className="p-3 bg-blue-400 rounded-full"
+              >
+                <img
+                  src="/icons/twitter.svg"
+                  alt="Twitter"
+                  className="w-6 h-6"
+                />
+              </button>
+              <button
+                onClick={() =>
+                  window.open(
+                    `mailto:?subject=Check out my comic reel&body=${encodeURIComponent(
+                      shareUrl
+                    )}`,
+                    "_blank"
+                  )
+                }
+                className="p-3 bg-red-500 rounded-full"
+              >
+                <img src="/icons/mail.svg" alt="Email" className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setShowShareModal(false)}
+                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+              >
+                Close
+              </button>
+            </div>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
