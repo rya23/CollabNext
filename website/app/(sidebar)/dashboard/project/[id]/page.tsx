@@ -280,33 +280,33 @@ export default function DocumentManager() {
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-gray-900">
+        <div className="flex flex-col min-h-screen bg-background">
             <Toaster />
 
             {/* Glassmorphism Header */}
-            <div className="sticky top-0 z-40 backdrop-blur-xl bg-gray-900/80 border-b border-gray-800">
+            <div className="sticky top-0 z-40 backdrop-blur-xl bg-background/80 border-b border-border">
                 <div className="flex items-center justify-between px-6 py-4">
                     <div className="flex items-center gap-4">
                         <motion.div
                             initial={{ scale: 0.5, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
-                            className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600"
+                            className="p-2 rounded-xl bg-gradient-to-br from-primary to-primary/80"
                         >
-                            <Layout className="w-6 h-6 text-white" />
+                            <Layout className="w-6 h-6 text-primary-foreground" />
                         </motion.div>
                         <div>
-                            <h1 className="text-xl font-bold text-white">{projectData?.title || 'Project Documents'}</h1>
-                            <p className="text-sm text-gray-400">Manage your project files</p>
+                            <h1 className="text-xl font-bold text-foreground">{projectData?.title || 'Project Documents'}</h1>
+                            <p className="text-sm text-muted-foreground">Manage your project files</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
                         <button
-                            className="p-2 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
+                            className="p-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-accent-foreground transition-colors"
                             onClick={() => setIsShareDialogOpen(true)}
                         >
                             <Share2 className="w-5 h-5" />
                         </button>
-                        <button className="p-2 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors">
+                        <button className="p-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-accent-foreground transition-colors">
                             <Settings className="w-5 h-5" />
                         </button>
                     </div>
@@ -317,20 +317,20 @@ export default function DocumentManager() {
                 {/* Search and Actions */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                     <div className="relative flex-1 max-w-md">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                             type="text"
                             placeholder="Search documents..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-10 bg-gray-800 border-gray-700 text-gray-300 placeholder-gray-500 focus:border-blue-500"
+                            className="pl-10 bg-input border-border text-foreground placeholder-muted-foreground focus:border-ring"
                         />
                     </div>
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => setIsCreatingDoc(true)}
-                        className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg shadow-lg hover:from-blue-700 hover:to-indigo-700 transition-all"
+                        className="flex items-center gap-2 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground px-4 py-2 rounded-lg shadow-primary hover:from-primary/90 hover:to-primary/70 transition-all"
                     >
                         <Plus className="h-5 w-5" />
                         New Document
@@ -340,11 +340,11 @@ export default function DocumentManager() {
                 {/* Templates Section */}
                 <div className="mb-12">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xl font-semibold text-white flex items-center gap-2">
-                            <Sparkles className="h-5 w-5 text-blue-400" />
+                        <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
+                            <Sparkles className="h-5 w-5 text-primary" />
                             Featured Templates
                         </h2>
-                        <button className="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1">
+                        <button className="text-sm text-primary hover:text-primary/80 flex items-center gap-1">
                             View all templates
                             <ChevronRight className="h-4 w-4" />
                         </button>
@@ -363,16 +363,16 @@ export default function DocumentManager() {
                                 />
 
                                 {/* Content */}
-                                <div className="relative p-6 rounded-xl bg-gray-800 border border-gray-700 group-hover:border-gray-600 transition-all">
+                                <div className="relative p-6 rounded-xl bg-card border border-border group-hover:border-muted transition-all">
                                     <div className="flex items-start gap-4">
                                         <div className={`p-3 rounded-lg bg-gradient-to-br ${template.color}`}>
-                                            <template.icon className="h-6 w-6 text-white" />
+                                            <template.icon className="h-6 w-6 text-card-foreground" />
                                         </div>
                                         <div>
-                                            <h3 className="font-semibold text-white group-hover:text-blue-400 transition-colors">
+                                            <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
                                                 {template.title}
                                             </h3>
-                                            <p className="text-sm text-gray-400 mt-1">{template.description}</p>
+                                            <p className="text-sm text-muted-foreground mt-1">{template.description}</p>
                                         </div>
                                     </div>
 
@@ -381,7 +381,7 @@ export default function DocumentManager() {
                                         <motion.button
                                             whileHover={{ scale: 1.1 }}
                                             whileTap={{ scale: 0.9 }}
-                                            className={`p-2 rounded-lg bg-gradient-to-r ${template.color} text-white shadow-lg`}
+                                            className={`p-2 rounded-lg bg-gradient-to-r ${template.color} text-card-foreground shadow-lg`}
                                         >
                                             <Plus className="h-4 w-4" />
                                         </motion.button>
@@ -394,8 +394,8 @@ export default function DocumentManager() {
 
                 {/* Recent Documents */}
                 <div>
-                    <h2 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
-                        <Clock className="h-5 w-5 text-blue-400" />
+                    <h2 className="text-xl font-semibold text-foreground mb-6 flex items-center gap-2">
+                        <Clock className="h-5 w-5 text-primary" />
                         Recent Documents
                     </h2>
                     <div className="grid gap-4">
@@ -404,18 +404,18 @@ export default function DocumentManager() {
                             Array(3)
                                 .fill(0)
                                 .map((_, index) => (
-                                    <div key={index} className="p-4 rounded-xl bg-gray-800 border border-gray-700 animate-pulse">
+                                    <div key={index} className="p-4 rounded-xl bg-card border border-border animate-pulse">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-4">
-                                                <div className="p-2 rounded-lg bg-gray-700 h-9 w-9"></div>
+                                                <div className="p-2 rounded-lg bg-muted h-9 w-9"></div>
                                                 <div>
-                                                    <div className="h-5 w-48 bg-gray-700 rounded mb-2"></div>
-                                                    <div className="h-3 w-32 bg-gray-700 rounded"></div>
+                                                    <div className="h-5 w-48 bg-muted rounded mb-2"></div>
+                                                    <div className="h-3 w-32 bg-muted rounded"></div>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-4">
-                                                <div className="hidden md:block w-32 h-2 bg-gray-700 rounded-full"></div>
-                                                <div className="w-20 h-6 bg-gray-700 rounded-full"></div>
+                                                <div className="hidden md:block w-32 h-2 bg-muted rounded-full"></div>
+                                                <div className="w-20 h-6 bg-muted rounded-full"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -435,16 +435,16 @@ export default function DocumentManager() {
                                 />
                             ))
                         ) : (
-                            <div className="p-8 text-center rounded-xl bg-gray-800 border border-gray-700">
-                                <FileText className="h-10 w-10 text-gray-500 mx-auto mb-4" />
-                                <h3 className="text-lg font-medium text-white mb-2">No documents found</h3>
-                                <p className="text-gray-400 mb-6">
+                            <div className="p-8 text-center rounded-xl bg-card border border-border">
+                                <FileText className="h-10 w-10 text-muted mx-auto mb-4" />
+                                <h3 className="text-lg font-medium text-foreground mb-2">No documents found</h3>
+                                <p className="text-muted-foreground mb-6">
                                     {searchQuery ? 'Try a different search term' : 'Create your first document to get started'}
                                 </p>
                                 <Link href="/create">
                                     <button
                                         onClick={() => {}}
-                                        className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all"
+                                        className="px-4 py-2 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground rounded-lg hover:from-primary/90 hover:to-primary/70 transition-all"
                                     >
                                         Create a Document
                                     </button>
@@ -463,11 +463,11 @@ export default function DocumentManager() {
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            className="bg-gray-800 p-6 rounded-xl shadow-xl max-w-md w-full mx-4 border border-gray-700"
+                            className="bg-card p-6 rounded-xl shadow-xl max-w-md w-full mx-4 border border-border"
                         >
                             <div className="flex justify-between items-center mb-6">
-                                <h3 className="text-xl font-semibold text-white">Create New Document</h3>
-                                <button className="text-gray-400 hover:text-gray-300 transition-colors">
+                                <h3 className="text-xl font-semibold text-foreground">Create New Document</h3>
+                                <button className="text-muted-foreground hover:text-muted transition-colors">
                                     <Plus className="h-6 w-6 transform rotate-45" />
                                 </button>
                             </div>
@@ -476,12 +476,12 @@ export default function DocumentManager() {
                                 placeholder="Document Title"
                                 value={newDocTitle}
                                 onChange={(e) => setNewDocTitle(e.target.value)}
-                                className="bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400 mb-6"
+                                className="bg-input border-border text-foreground placeholder-muted-foreground mb-6"
                             />
                             <div className="flex justify-end gap-3">
                                 <button
                                     onClick={() => setIsCreatingDoc(false)}
-                                    className="px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
+                                    className="px-4 py-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
                                     disabled={isLoading}
                                 >
                                     Cancel
@@ -489,7 +489,7 @@ export default function DocumentManager() {
                                 <button
                                     onClick={handleCreateDocument}
                                     disabled={isLoading}
-                                    className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all disabled:opacity-50"
+                                    className="px-4 py-2 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground rounded-lg hover:from-primary/90 hover:to-primary/70 transition-all disabled:opacity-50"
                                 >
                                     {isLoading ? 'Creating...' : 'Create Document'}
                                 </button>

@@ -151,7 +151,7 @@ export default function ComicGenerator() {
                 <div className="relative aspect-square">
                   <img
                     src={`data:${image.mimeType};base64,${image.data}`}
-                    alt={`Comic panel ${index + 1}`}
+                    alt={`Comic  ${index + 1}`}
                     className="object-contain w-full h-full"
                   />
                 </div>
