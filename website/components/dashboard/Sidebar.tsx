@@ -49,11 +49,11 @@ const menuItems = [
         icon: Settings,
         path: '/dashboard/settings',
     },
-    {
-        title: 'Flow Chart',
-        icon: LayoutDashboard,
-        path: '/dashboard/flow',
-    },
+    // {
+    //     title: 'Flow Chart',
+    //     icon: LayoutDashboard,
+    //     path: '/dashboard/flow',
+    // },
     {
         title: 'Readers',
         icon: BookOpenCheck,
