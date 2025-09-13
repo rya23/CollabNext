@@ -1,53 +1,41 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import {
-    LayoutDashboard,
-    Star,
-    Settings,
-    Users,
-    FolderKanban,
-    Bell,
-    LogOut,
-    ChevronLeft,
-    Menu,
-    Loader2,
-    BookOpenCheck,
-} from 'lucide-react';
-import { auth } from '@/auth';
-import { handleSignOut } from '@/app/actions/auth';
-import { useToast } from '@/components/ui/use-toast';
-import Image from 'next/image';
-import path from 'path';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import { LayoutDashboard, Star, Settings, Users, FolderKanban, Bell, LogOut, ChevronLeft, Menu, Loader2, BookOpenCheck } from "lucide-react";
+import { auth } from "@/auth";
+import { handleSignOut } from "@/app/actions/auth";
+import { useToast } from "@/components/ui/use-toast";
+import Image from "next/image";
+import path from "path";
 
 const menuItems = [
     {
-        title: 'Dashboard',
+        title: "Dashboard",
         icon: LayoutDashboard,
-        path: '/dashboard',
+        path: "/dashboard",
     },
     {
-        title: 'Projects',
+        title: "Projects",
         icon: FolderKanban,
-        path: '/dashboard/project/1',
+        path: "/dashboard/project/1",
     },
     {
-        title: 'Favorites',
+        title: "Favorites",
         icon: Star,
-        path: '/dashboard/favorites',
+        path: "/dashboard/favorites",
     },
     {
-        title: 'Whiteboard',
+        title: "Whiteboard",
         icon: LayoutDashboard,
-        path: '/dashboard/whiteboard',
+        path: "/dashboard/whiteboard",
     },
     {
-        title: 'Settings',
+        title: "Settings",
         icon: Settings,
-        path: '/dashboard/settings',
+        path: "/dashboard/settings",
     },
     // {
     //     title: 'Flow Chart',
@@ -55,19 +43,19 @@ const menuItems = [
     //     path: '/dashboard/flow',
     // },
     {
-        title: 'Readers',
+        title: "Readers",
         icon: BookOpenCheck,
-        path: '/dashboard/readers',
+        path: "/dashboard/readers",
     },
     {
-        title: 'Community',
+        title: "Community",
         icon: Users,
-        path: '/dashboard/community',
+        path: "/dashboard/community",
     },
     {
-        title: 'Kanban',
+        title: "Kanban",
         icon: FolderKanban,
-        path: '/dashboard/kanban',
+        path: "/dashboard/kanban",
     },
 ];
 
@@ -96,8 +84,8 @@ export default function Sidebar({ session }: { session: any }) {
 
     // Get user initials for avatar fallback
     const getInitials = (name: string) => {
-        if (!name) return 'U';
-        const names = name.split(' ');
+        if (!name) return "U";
+        const names = name.split(" ");
         if (names.length >= 2) {
             return `${names[0][0]}${names[1][0]}`.toUpperCase();
         }
@@ -115,15 +103,13 @@ export default function Sidebar({ session }: { session: any }) {
             </button>
 
             {/* Backdrop for mobile */}
-            {!isCollapsed && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm lg:hidden z-40" onClick={() => setIsCollapsed(true)} />
-            )}
+            {!isCollapsed && <div className="fixed inset-0 bg-black/50 backdrop-blur-sm lg:hidden z-40" onClick={() => setIsCollapsed(true)} />}
 
             {/* Sidebar */}
             <motion.div
                 initial={{ x: -300 }}
                 animate={{ x: isCollapsed ? -300 : 0 }}
-                transition={{ type: 'spring', damping: 20 }}
+                transition={{ type: "spring", damping: 20 }}
                 className={`fixed left-0 top-0 bottom-0 w-[280px] bg-background border-r border-border flex flex-col z-50`}
             >
                 {/* Logo Section */}
@@ -147,18 +133,13 @@ export default function Sidebar({ session }: { session: any }) {
                                         className={`flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-all group
                       ${
                           isActive
-                              ? 'bg-secondary text-secondary-foreground'
-                              : 'text-muted-foreground hover:bg-secondary/50 hover:text-secondary-foreground'
+                              ? "bg-secondary text-secondary-foreground"
+                              : "text-muted-foreground hover:bg-secondary/50 hover:text-secondary-foreground"
                       }`}
                                     >
                                         <item.icon className="w-5 h-5" />
                                         <span className="font-medium">{item.title}</span>
-                                        {isActive && (
-                                            <motion.div
-                                                layoutId="active-pill"
-                                                className="ml-auto w-2 h-2 rounded-full bg-primary"
-                                            />
-                                        )}
+                                        {isActive && <motion.div layoutId="active-pill" className="ml-auto w-2 h-2 rounded-full bg-primary" />}
                                     </div>
                                 </Link>
                             );
@@ -172,11 +153,9 @@ export default function Sidebar({ session }: { session: any }) {
                                 <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
                                     <Bell className="w-4 h-4 text-primary" />
                                 </div>
-                                <span className="text-sm font-medium text-card-foreground">What's new?</span>
+                                <span className="text-sm font-medium text-card-foreground">What&apos;s new?</span>
                             </div>
-                            <p className="text-xs text-muted-foreground">
-                                Check out the latest updates and features in our changelog.
-                            </p>
+                            <p className="text-xs text-muted-foreground">Check out the latest updates and features in our changelog.</p>
                         </div>
                     </div>
                 </div>
@@ -196,22 +175,14 @@ export default function Sidebar({ session }: { session: any }) {
                     ) : user ? (
                         <div className="flex items-center gap-3 px-2">
                             {user.image ? (
-                                <Image
-                                    src={user.image}
-                                    alt={user.name || 'User'}
-                                    width={40}
-                                    height={40}
-                                    className="rounded-full"
-                                />
+                                <Image src={user.image} alt={user.name || "User"} width={40} height={40} className="rounded-full" />
                             ) : (
                                 <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-                                    <span className="text-primary-foreground font-medium">
-                                        {getInitials(user.name || 'User')}
-                                    </span>
+                                    <span className="text-primary-foreground font-medium">{getInitials(user.name || "User")}</span>
                                 </div>
                             )}
-                            <div className="flex-1 hover:cursor-pointer " onClick={() => router.push('/dashboard/profile')}>
-                                <h4 className="text-sm font-medium ">{user.name || 'User'}</h4>
+                            <div className="flex-1 hover:cursor-pointer " onClick={() => router.push("/dashboard/profile")}>
+                                <h4 className="text-sm font-medium ">{user.name || "User"}</h4>
                                 <p className="text-xs text-gray-400">{user.email}</p>
                             </div>
                             <button
@@ -241,10 +212,10 @@ export default function Sidebar({ session }: { session: any }) {
             <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
                 className={`fixed ${
-                    isCollapsed ? 'left-4' : 'left-[260px]'
+                    isCollapsed ? "left-4" : "left-[260px]"
                 } top-8 w-8 h-8 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-secondary-foreground transition-colors z-50`}
             >
-                <ChevronLeft className={`w-5 h-5 transition-transform ${isCollapsed ? 'rotate-180' : ''}`} />
+                <ChevronLeft className={`w-5 h-5 transition-transform ${isCollapsed ? "rotate-180" : ""}`} />
             </button>
         </>
     );

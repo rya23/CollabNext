@@ -1,32 +1,32 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { NextRequest, NextResponse } from 'next/server';
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { NextRequest, NextResponse } from "next/server";
 
 // Initialize the Google Generative AI client with the API key
-const apiKey = 'AIzaSyABHWecL1WasCQlnz6K7GJkqOBFW9Ac-PM';
 
 interface ChatMessage {
-    role: 'user' | 'assistant';
+    role: "user" | "assistant";
     content: string;
     generatedPrompt?: string;
 }
 
 export async function POST(request: NextRequest) {
+    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY as string;
     try {
         // Parse the request body
         const { story, history } = await request.json();
 
         // Validate the story input
         if (!story) {
-            return NextResponse.json({ error: 'Story input is required' }, { status: 400 });
+            return NextResponse.json({ error: "Story input is required" }, { status: 400 });
         }
-        
+
         // Process chat history if available
-        const chatHistory = history as ChatMessage[] || [];
+        const chatHistory = (history as ChatMessage[]) || [];
 
         // Initialize the Gemini API client
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
-            model: 'gemini-2.0-flash',
+            model: "gemini-2.0-flash",
             systemInstruction: `You are an AI expert at creating directly usable image-generation prompts for comic strips. Your only task is to transform a user's basic story idea into a single, structured prompt for an image generation AI. This prompt must be immediately usable by an image generator. The readability of any requested bubble text is paramount. You must decide the optimal number of panels to tell the story (4-8). Prioritize simplicity, directness, and the absence of any extra text.
 Your Process:
 Analyze User's Input: Identify characters, setting, and plot events.
@@ -68,7 +68,7 @@ ABSOLUTELY OMIT all unnecessary text, explanations, or introductions. Your outpu
             topP: 0.95,
             topK: 40,
             maxOutputTokens: 8192,
-            responseMimeType: 'text/plain',
+            responseMimeType: "text/plain",
         };
 
         // Create a chat session
@@ -76,25 +76,25 @@ ABSOLUTELY OMIT all unnecessary text, explanations, or introductions. Your outpu
             generationConfig,
             history: [],
         });
-        
+
         // Prepare context from chat history
         let contextPrompt = story;
-        
+
         if (chatHistory.length > 0) {
             // Extract previous prompts and user requests for context
             const historyContext = chatHistory
-                .filter(msg => msg.role === 'user' || msg.generatedPrompt)
-                .map(msg => {
-                    if (msg.role === 'user') {
+                .filter((msg) => msg.role === "user" || msg.generatedPrompt)
+                .map((msg) => {
+                    if (msg.role === "user") {
                         return `User request: ${msg.content}`;
                     } else if (msg.generatedPrompt) {
                         return `Previous comic prompt: ${msg.generatedPrompt}`;
                     }
-                    return '';
+                    return "";
                 })
-                .filter(text => text !== '')
-                .join('\n\n');
-            
+                .filter((text) => text !== "")
+                .join("\n\n");
+
             if (historyContext) {
                 contextPrompt = `Previous context:\n${historyContext}\n\nNew request: ${story}\n\nPlease generate a comic prompt that takes into account the previous context and the new request. If the user is requesting changes to the previous panels, modify the prompt accordingly.`;
             }
@@ -111,7 +111,7 @@ ABSOLUTELY OMIT all unnecessary text, explanations, or introductions. Your outpu
             prompt: generatedPrompt,
         });
     } catch (error) {
-        console.error('Error generating comic prompt:', error);
-        return NextResponse.json({ error: 'Failed to generate comic prompt' }, { status: 500 });
+        console.error("Error generating comic prompt:", error);
+        return NextResponse.json({ error: "Failed to generate comic prompt" }, { status: 500 });
     }
 }

@@ -51,7 +51,7 @@ export default function ShareDialog({
         <DialogHeader>
           <DialogTitle className="text-white">Share Project</DialogTitle>
           <DialogDescription className="text-gray-400">
-            Share "{projectTitle}" with others
+            Share &apos;{projectTitle}&apos; with others
           </DialogDescription>
         </DialogHeader>
 

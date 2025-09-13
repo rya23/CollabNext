@@ -1,14 +1,13 @@
-'use client';
-import Drawer from './Drawer';
-import { motion } from 'framer-motion';
-import Lottie from 'lottie-react';
-import animationData from '../public/animation.json'; // Update this path to where your JSON file is located
-import vision from '../public/animation1.json'; // Update this path to where your JSON file is located
-import { useEffect, useRef, useState } from 'react';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Button } from '@/components/ui/button';
-import { ArrowRight, ChevronRight } from 'lucide-react';
-import { CardHoverEffectDemo } from './CardEffect';
+"use client";
+import Drawer from "./Drawer";
+import { motion } from "framer-motion";
+import animationData from "../public/animation.json"; // Update this path to where your JSON file is located
+import vision from "../public/animation1.json"; // Update this path to where your JSON file is located
+import { useEffect, useRef, useState } from "react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, ChevronRight } from "lucide-react";
+import { CardHoverEffectDemo } from "./CardEffect";
 // import CameraOCR from './CameraOCR';
 
 // Feature card component
@@ -18,16 +17,14 @@ const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode; titl
             className="bg-card border border-border rounded-xl p-6 flex flex-col items-center"
             whileHover={{
                 y: -5,
-                boxShadow: '0 10px 30px -15px rgba(138, 75, 175, 0.2)',
+                boxShadow: "0 10px 30px -15px rgba(138, 75, 175, 0.2)",
             }}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
         >
-            <div className="bg-gradient-to-r from-primary to-primary/80 w-12 h-12 rounded-full flex items-center justify-center mb-4">
-                {icon}
-            </div>
+            <div className="bg-gradient-to-r from-primary to-primary/80 w-12 h-12 rounded-full flex items-center justify-center mb-4">{icon}</div>
             <h3 className="text-xl font-semibold mb-2 text-foreground">{title}</h3>
             <p className="text-muted-foreground text-center">{description}</p>
         </motion.div>
@@ -50,7 +47,7 @@ const AboutUsSection = () => {
                     whileInView={{ opacity: 1, x: 0 }}
                     transition={{
                         duration: 0.8,
-                        ease: 'easeOut',
+                        ease: "easeOut",
                     }}
                     viewport={{ once: true, amount: 0.3 }}
                 >
@@ -76,10 +73,9 @@ const AboutUsSection = () => {
                         animate="visible"
                         transition={{ duration: 0.5, delay: 0.2 }}
                     >
-                        We envision a future where creativity flows seamlessly, free from technical barriers. Our AI-driven
-                        copilot empowers content creators and filmmakers to bring their ideas to life effortlessly. By integrating
-                        cutting-edge technology with intuitive collaboration tools, we strive to enhance storytelling, streamline
-                        workflows, and revolutionize the creative process.
+                        We envision a future where creativity flows seamlessly, free from technical barriers. Our AI-driven copilot empowers content
+                        creators and filmmakers to bring their ideas to life effortlessly. By integrating cutting-edge technology with intuitive
+                        collaboration tools, we strive to enhance storytelling, streamline workflows, and revolutionize the creative process.
                     </motion.p>
                 </motion.div>
 
@@ -88,14 +84,14 @@ const AboutUsSection = () => {
                     className="w-full md:w-1/2 max-w-[600px] p-4 flex justify-center"
                     initial={{ opacity: 0, x: 50 }}
                     whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.8, ease: 'easeOut' }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
                     viewport={{ once: true, amount: 0.3 }}
                 >
-                    <Lottie
+                    {/* <Lottie
                            animationData={animationData}
                             className="w-full"
                                loop={true}
-                                   />
+                                   /> */}
                 </motion.div>
             </div>
 
@@ -114,7 +110,7 @@ const AboutUsSection = () => {
                     whileInView={{ opacity: 1, x: 0 }}
                     transition={{
                         duration: 0.8,
-                        ease: 'easeOut',
+                        ease: "easeOut",
                     }}
                     viewport={{ once: true, amount: 0.3 }}
                 >
@@ -140,27 +136,27 @@ const AboutUsSection = () => {
                         animate="visible"
                         transition={{ duration: 0.5, delay: 0.2 }}
                     >
-                        We're dedicated to building tools that break down creative barriers and foster collaboration. Our platform
-                        connects visionaries, enabling them to transform ideas into reality through intuitive interfaces and
-                        powerful AI assistance. We believe in a future where technology enhances human creativity rather than
-                        replacing it, making professional-quality content creation accessible to everyone.
+                        We&apos;re dedicated to building tools that break down creative barriers and foster collaboration. Our platform connects
+                        visionaries, enabling them to transform ideas into reality through intuitive interfaces and powerful AI assistance. We believe
+                        in a future where technology enhances human creativity rather than replacing it, making professional-quality content creation
+                        accessible to everyone.
                     </motion.p>
                 </motion.div>
 
                 {/* Add Vision.webm video */}
                 <motion.div
-    className="w-full md:w-1/2 max-w-[600px] p-4 flex justify-center"
-    initial={{ opacity: 0, x: -50 }}
-    whileInView={{ opacity: 1, x: 0 }}
-    transition={{ duration: 0.8, ease: 'easeOut' }}
-    viewport={{ once: true, amount: 0.3 }}
->
-    <Lottie
+                    className="w-full md:w-1/2 max-w-[600px] p-4 flex justify-center"
+                    initial={{ opacity: 0, x: -50 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    viewport={{ once: true, amount: 0.3 }}
+                >
+                    {/* <Lottie
         animationData={vision} // Changed from vision={vision} to animationData={vision}
         className="w-full"
         loop={true}
-    />
-</motion.div>
+    /> */}
+                </motion.div>
             </div>
 
             <div className="py-12 sm:py-24 px-4 sm:px-5">
@@ -179,7 +175,7 @@ const AboutUsSection = () => {
                     </p>
                 </motion.div>
 
-                {typeof CardHoverEffectDemo === 'function' ? <CardHoverEffectDemo /> : null}
+                {typeof CardHoverEffectDemo === "function" ? <CardHoverEffectDemo /> : null}
             </div>
 
             {/* FAQ Section - Adjusted padding and width */}
@@ -210,9 +206,8 @@ const AboutUsSection = () => {
                                 How does the AI assistant work?
                             </AccordionTrigger>
                             <AccordionContent className="text-muted-foreground text-sm sm:text-base">
-                                Our AI assistant analyzes your project needs and creative direction to offer intelligent
-                                suggestions, streamline workflows, and help overcome technical obstacles that might slow down your
-                                creative process.
+                                Our AI assistant analyzes your project needs and creative direction to offer intelligent suggestions, streamline
+                                workflows, and help overcome technical obstacles that might slow down your creative process.
                             </AccordionContent>
                         </AccordionItem>
                         <AccordionItem value="item-2" className="border-b border-border">
@@ -220,8 +215,8 @@ const AboutUsSection = () => {
                                 Is my data secure on your platform?
                             </AccordionTrigger>
                             <AccordionContent className="text-muted-foreground text-sm sm:text-base">
-                                Absolutely. We employ enterprise-grade encryption and security protocols to ensure that all your
-                                creative assets and data remain private and protected at all times.
+                                Absolutely. We employ enterprise-grade encryption and security protocols to ensure that all your creative assets and
+                                data remain private and protected at all times.
                             </AccordionContent>
                         </AccordionItem>
                         <AccordionItem value="item-3" className="border-b border-border">
@@ -229,8 +224,8 @@ const AboutUsSection = () => {
                                 Can I collaborate with my team in real-time?
                             </AccordionTrigger>
                             <AccordionContent className="text-muted-foreground text-sm sm:text-base">
-                                Yes, our platform is built for seamless collaboration. Multiple team members can work
-                                simultaneously on projects with changes synced in real-time, regardless of location.
+                                Yes, our platform is built for seamless collaboration. Multiple team members can work simultaneously on projects with
+                                changes synced in real-time, regardless of location.
                             </AccordionContent>
                         </AccordionItem>
                         <AccordionItem value="item-4" className="border-b border-border">
@@ -238,8 +233,8 @@ const AboutUsSection = () => {
                                 What type of creative projects can I use this for?
                             </AccordionTrigger>
                             <AccordionContent className="text-muted-foreground text-sm sm:text-base">
-                                Our platform is versatile and supports a wide range of creative projects including film
-                                production, digital content creation, interactive media, and more.
+                                Our platform is versatile and supports a wide range of creative projects including film production, digital content
+                                creation, interactive media, and more.
                             </AccordionContent>
                         </AccordionItem>
                     </Accordion>
@@ -254,9 +249,7 @@ const AboutUsSection = () => {
                 transition={{ duration: 0.8 }}
                 viewport={{ once: true }}
             >
-                <h2 className="text-2xl sm:text-4xl font-bold mb-4 sm:mb-6 text-foreground">
-                    Ready to Transform Your Creative Process?
-                </h2>
+                <h2 className="text-2xl sm:text-4xl font-bold mb-4 sm:mb-6 text-foreground">Ready to Transform Your Creative Process?</h2>
                 <p className="text-muted-foreground text-sm sm:text-base max-w-2xl mx-auto mb-6 sm:mb-8">
                     Join thousands of creators who are already using our platform to bring their ideas to life.
                 </p>

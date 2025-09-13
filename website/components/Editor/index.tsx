@@ -1,21 +1,21 @@
-'use client';
+"use client";
 
-import { useLiveblocksExtension, FloatingToolbar } from '@liveblocks/react-tiptap';
-import { useEditor, EditorContent } from '@tiptap/react';
-import { useMemo } from 'react';
-import StarterKit from '@tiptap/starter-kit';
-import Highlight from '@tiptap/extension-highlight';
-import Typography from '@tiptap/extension-typography';
-import TextAlign from '@tiptap/extension-text-align';
-import Link from '@tiptap/extension-link';
-import Image from '@tiptap/extension-image';
-import { Threads } from './Threads';
+import { useLiveblocksExtension, FloatingToolbar } from "@liveblocks/react-tiptap";
+import { useEditor, EditorContent } from "@tiptap/react";
+import { useMemo } from "react";
+import StarterKit from "@tiptap/starter-kit";
+import Highlight from "@tiptap/extension-highlight";
+import Typography from "@tiptap/extension-typography";
+import TextAlign from "@tiptap/extension-text-align";
+import Link from "@tiptap/extension-link";
+import Image from "@tiptap/extension-image";
+import { Threads } from "./Threads";
 
 export default function Editor() {
     const liveblocks = useLiveblocksExtension();
 
-    const editor = useMemo(() =>
-        useEditor({
+    const editor = useEditor(
+        {
             extensions: [
                 liveblocks,
                 StarterKit.configure({
@@ -27,7 +27,7 @@ export default function Editor() {
                 Highlight,
                 Typography,
                 TextAlign.configure({
-                    types: ['heading', 'paragraph'],
+                    types: ["heading", "paragraph"],
                 }),
                 Link.configure({
                     openOnClick: true,
@@ -37,8 +37,9 @@ export default function Editor() {
                 }),
             ],
             immediatelyRender: false,
-        })
-    , [liveblocks]);
+        },
+        [liveblocks]
+    );
 
     return (
         <div className="max-w-4xl mx-auto p-5">
@@ -46,7 +47,7 @@ export default function Editor() {
                 <button
                     onClick={() => editor?.chain().focus().toggleBold().run()}
                     className={`px-3 py-1.5 rounded-md transition-colors ${
-                        editor?.isActive('bold') ? 'bg-gray-200 text-gray-900' : 'hover:bg-gray-100'
+                        editor?.isActive("bold") ? "bg-gray-200 text-gray-900" : "hover:bg-gray-100"
                     }`}
                 >
                     Bold
@@ -54,7 +55,7 @@ export default function Editor() {
                 <button
                     onClick={() => editor?.chain().focus().toggleItalic().run()}
                     className={`px-3 py-1.5 rounded-md transition-colors ${
-                        editor?.isActive('italic') ? 'bg-gray-200 text-gray-900' : 'hover:bg-gray-100'
+                        editor?.isActive("italic") ? "bg-gray-200 text-gray-900" : "hover:bg-gray-100"
                     }`}
                 >
                     Italic
@@ -62,7 +63,7 @@ export default function Editor() {
                 <button
                     onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
                     className={`px-3 py-1.5 rounded-md transition-colors ${
-                        editor?.isActive('heading', { level: 1 }) ? 'bg-gray-200 text-gray-900' : 'hover:bg-gray-100'
+                        editor?.isActive("heading", { level: 1 }) ? "bg-gray-200 text-gray-900" : "hover:bg-gray-100"
                     }`}
                 >
                     H1
@@ -70,23 +71,23 @@ export default function Editor() {
                 <button
                     onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
                     className={`px-3 py-1.5 rounded-md transition-colors ${
-                        editor?.isActive('heading', { level: 2 }) ? 'bg-gray-200 text-gray-900' : 'hover:bg-gray-100'
+                        editor?.isActive("heading", { level: 2 }) ? "bg-gray-200 text-gray-900" : "hover:bg-gray-100"
                     }`}
                 >
                     H2
                 </button>
                 <button
-                    onClick={() => editor?.chain().focus().setTextAlign('left').run()}
+                    onClick={() => editor?.chain().focus().setTextAlign("left").run()}
                     className={`px-3 py-1.5 rounded-md transition-colors ${
-                        editor?.isActive({ textAlign: 'left' }) ? 'bg-gray-200 text-gray-900' : 'hover:bg-gray-100'
+                        editor?.isActive({ textAlign: "left" }) ? "bg-gray-200 text-gray-900" : "hover:bg-gray-100"
                     }`}
                 >
                     Left
                 </button>
                 <button
-                    onClick={() => editor?.chain().focus().setTextAlign('center').run()}
+                    onClick={() => editor?.chain().focus().setTextAlign("center").run()}
                     className={`px-3 py-1.5 rounded-md transition-colors ${
-                        editor?.isActive({ textAlign: 'center' }) ? 'bg-gray-200 text-gray-900' : 'hover:bg-gray-100'
+                        editor?.isActive({ textAlign: "center" }) ? "bg-gray-200 text-gray-900" : "hover:bg-gray-100"
                     }`}
                 >
                     Center

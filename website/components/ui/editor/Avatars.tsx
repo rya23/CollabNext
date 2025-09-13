@@ -1,9 +1,10 @@
-import { useOthers, useSelf } from '@liveblocks/react/suspense';
-import styles from './Avatars.module.css';
+import { useOthers, useSelf } from "@liveblocks/react/suspense";
+import styles from "./Avatars.module.css";
 
 export function Avatars() {
     const users = useOthers();
     const currentUser = useSelf();
+    console.log({ users, currentUser });
 
     return (
         <div className={styles.avatars}>
@@ -17,6 +18,7 @@ export function Avatars() {
                 </div>
             )}
         </div>
+        
     );
 }
 

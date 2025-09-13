@@ -1,8 +1,6 @@
-'use client';
+"use client";
 import { nanoid } from "nanoid";
 import { useRouter } from "next/navigation";
-
-const router = useRouter();
 
 interface Template {
     id: number;
@@ -13,28 +11,35 @@ interface Template {
     fileId?: string;
 }
 
-const handleSelectTemplate = (templateId: number) => {
-    // Find the selected template
-    const template = templates.find((t: Template) => t.id === templateId);
+export default function Page() {
+    const router = useRouter();
 
-    if (!template) return;
+    const handleSelectTemplate = (templateId: number) => {
+        // Find the selected template
+        const template = templates.find((t: Template) => t.id === templateId);
 
-    // If template has a fileId, use that directly
-    if (template.fileId) {
-        router.push(`/create/file/${template.fileId}`);
-        return;
-    }
+        if (!template) return;
 
-    // Fallback to existing template logic for templates without fileId
-    const documentId = nanoid(10);
-    const templateNameMap: Record<number, string> = {
-        8: 'blank',
-        2: 'college-assignment',
+        // If template has a fileId, use that directly
+        if (template.fileId) {
+            router.push(`/create/file/${template.fileId}`);
+            return;
+        }
+
+        // Fallback to existing template logic for templates without fileId
+        const documentId = nanoid(10);
+        const templateNameMap: Record<number, string> = {
+            8: "blank",
+            2: "college-assignment",
+        };
+        const templateName = templateNameMap[templateId];
+        if (templateName) {
+            router.push(`/create/file/${documentId}?template=${templateName}`);
+        } else {
+            router.push(`/create/file/${documentId}`);
+        }
     };
-    const templateName = templateNameMap[templateId];
-    if (templateName) {
-        router.push(`/create/file/${documentId}?template=${templateName}`);
-    } else {
-        router.push(`/create/file/${documentId}`);
-    }
-};
+
+    // Add your component JSX here
+    return <div>{/* Your component content */}</div>;
+}
