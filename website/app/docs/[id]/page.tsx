@@ -1,6 +1,6 @@
 'use client';
-import { nanoid } from 'nanoid';
-import { useRouter } from 'next/navigation';
+import { nanoid } from "nanoid";
+import { useRouter } from "next/navigation";
 
 const router = useRouter();
 

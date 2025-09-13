@@ -2,6 +2,7 @@
 
 import { useLiveblocksExtension, FloatingToolbar } from '@liveblocks/react-tiptap';
 import { useEditor, EditorContent } from '@tiptap/react';
+import { useMemo } from 'react';
 import StarterKit from '@tiptap/starter-kit';
 import Highlight from '@tiptap/extension-highlight';
 import Typography from '@tiptap/extension-typography';
@@ -13,29 +14,31 @@ import { Threads } from './Threads';
 export default function Editor() {
     const liveblocks = useLiveblocksExtension();
 
-    const editor = useEditor({
-        extensions: [
-            liveblocks,
-            StarterKit.configure({
-                history: false,
-                heading: {
-                    levels: [1, 2, 3],
-                },
-            }),
-            Highlight,
-            Typography,
-            TextAlign.configure({
-                types: ['heading', 'paragraph'],
-            }),
-            Link.configure({
-                openOnClick: true,
-            }),
-            Image.configure({
-                allowBase64: true,
-            }),
-        ],
-        immediatelyRender: false,
-    });
+    const editor = useMemo(() =>
+        useEditor({
+            extensions: [
+                liveblocks,
+                StarterKit.configure({
+                    history: false,
+                    heading: {
+                        levels: [1, 2, 3],
+                    },
+                }),
+                Highlight,
+                Typography,
+                TextAlign.configure({
+                    types: ['heading', 'paragraph'],
+                }),
+                Link.configure({
+                    openOnClick: true,
+                }),
+                Image.configure({
+                    allowBase64: true,
+                }),
+            ],
+            immediatelyRender: false,
+        })
+    , [liveblocks]);
 
     return (
         <div className="max-w-4xl mx-auto p-5">
