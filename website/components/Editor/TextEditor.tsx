@@ -128,7 +128,7 @@ function EditorWithStorage({ fileId }: TextEditorProps) {
 
   // Initialize storage only when needed
   const initStorage = useMutation(({ storage }, content) => {
-    if (!storage.has("content")) {
+    if (storage.get("content") === undefined) {
       storage.set("content", content);
       setStorageInitialized(true);
     }
@@ -261,7 +261,7 @@ function EditorWithStorage({ fileId }: TextEditorProps) {
         initStorage(localContent);
       } else {
         // Storage already has content - update our local state
-        setLocalContent(storageContent);
+        setLocalContent(storageContent ?? "");
       }
     }
   }, [
@@ -327,9 +327,8 @@ function EditorWithStorage({ fileId }: TextEditorProps) {
     }
   };
 
-  // Set up Tiptap editor
+  // Set up Tiptap editor (always call hook at top level)
   const liveblocks = useLiveblocksExtension();
-
   const editor = useEditor({
     editorProps: {
       attributes: {
@@ -420,7 +419,7 @@ function EditorWithStorage({ fileId }: TextEditorProps) {
         },
       }),
     ],
-    content: localContent || "<p></p>", // Ensure we always have valid HTML content
+    content: (isLoading || !firebaseLoaded) ? "<p></p>" : (localContent || "<p></p>"),
     onUpdate: ({ editor }) => {
       const newContent = editor.getHTML();
       console.log("Editor updated, content length:", newContent.length);
@@ -428,20 +427,11 @@ function EditorWithStorage({ fileId }: TextEditorProps) {
     },
   });
 
-  // Update editor content when our local content changes
-  useEffect(() => {
-    if (editor && localContent && editor.getHTML() !== localContent) {
-      console.log(
-        "Updating editor with local content, length:",
-        localContent.length
-      );
-      editor.commands.setContent(localContent);
-    }
-  }, [editor, localContent]);
+  // Remove effect that sets content after initialization to avoid double content
 
   const { threads } = useThreads();
 
-  if (isLoading) {
+  if (isLoading || !firebaseLoaded || !editor) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-500"></div>
