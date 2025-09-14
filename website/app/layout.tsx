@@ -4,6 +4,7 @@ import { Nunito } from "next/font/google";
 import { PT_Sans } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./Provider";
+import { Analytics } from "@vercel/analytics/next"
 
 const nunito = Nunito({
   variable: "--font-nunito",
@@ -33,6 +34,7 @@ export default function RootLayout({
       >
         <div className="texture" />
         <Providers> {children}</Providers>
+        <Analytics />
       </body>
     </html>
   );
