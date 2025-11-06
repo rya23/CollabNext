@@ -2,6 +2,9 @@
 
 ### *The Collaborative AI Editor for Filmmakers & Content Creators*
 
+[Demo Link](https://youtu.be/V7JPosz7kVw)
+
+
 **CollabNext** is a next-generation **AI-powered collaborative editor** built specifically for filmmakers, writers, and content creators.
 It redefines how AI assists in storytelling making it **a seamless, creative partner** rather than an intrusive tool.
 
